@@ -137,3 +137,22 @@ dist
 # Vite logs files
 vite.config.js.timestamp-*
 vite.config.ts.timestamp-*
+
+# Database files
+*.db
+*.sqlite
+*.sqlite3
+*.db-journal
+*.db-shm
+*.db-wal
+*.dump
+*.sql.backup
+*.sql.bak
+
+# History directories (VS Code Local History extension)
+.history/
+**/.history/
+
+# Logs directory (already covered by logs above, but being explicit)
+logs/
+**/logs/

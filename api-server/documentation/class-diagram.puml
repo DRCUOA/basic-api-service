@@ -1,0 +1,128 @@
+@startuml Class Diagram - Component Relationships
+
+skinparam classAttributeIconSize 0
+
+package "api/routes" {
+  class routes {
+    + router: Router
+    + get("/tasks"): listTasks
+    + post("/tasks"): createTask (commented)
+    + patch("/tasks/:id"): updateTasks (commented)
+    + delete("/tasks/:id"): deleteTasks (commented)
+  }
+}
+
+package "api/controllers" {
+  class taskController {
+    + listTasks(req, res): Promise<void>
+    + createTask(req, res): Promise<void>
+    + updateTasks(req, res): Promise<void>
+    + deleteTasks(req, res): Promise<void>
+  }
+}
+
+package "domain" {
+  class taskService {
+    + listTasks(): Promise<Task[]>
+    + createTask(data): Promise<Task>
+    + updateTasks(id, data): Promise<Task>
+    + deleteTasks(id): Promise<void>
+  }
+}
+
+package "data/models" {
+  class tasksDao {
+    + retrieveTaskById(id): Promise<Task|null>
+    + createTask(taskData): Promise<Task>
+    + updateTask(id, updates): Promise<Task|null>
+    + deleteTask(id): Promise<boolean>
+    - Note: retrieveAllTasks() missing but called by service
+  }
+  
+  class Task {
+    + id: INTEGER
+    + title: STRING
+    + description: TEXT
+    + completed: BOOLEAN
+    + createdAt: DATE
+    + updatedAt: DATE
+    + findByPk(id): Promise<Task>
+    + create(data): Promise<Task>
+    + findAll(): Promise<Task[]>
+  }
+}
+
+package "utils" {
+  class logger {
+    + info(message, meta): void
+    + error(message, meta): void
+  }
+}
+
+package "Root" {
+  class index {
+    + app: Express
+    + PORT: number
+    + initializeApp(): Promise<void>
+    + testConnection(): Promise<boolean>
+    + listen(): void
+  }
+}
+
+package "data" {
+  class database {
+    + getSequelize(): Sequelize
+    + testConnection(): Promise<boolean>
+    - sequelize.sync(): Error (poisoned)
+  }
+}
+
+index --> routes : uses
+index --> database : connects to
+routes --> taskController : routes to
+taskController --> taskService : calls
+taskController --> logger : uses
+taskService --> tasksDao : calls
+taskService --> logger : uses
+tasksDao --> Task : uses Sequelize model
+tasksDao --> logger : uses
+database --> Task : provides Sequelize instance
+
+note top of routes
+  HTTP Route definitions
+  Maps URLs to controller functions
+end note
+
+note top of taskController
+  Request/Response handling
+  HTTP status codes
+  Error handling
+end note
+
+note top of taskService
+  Business logic layer
+  Domain rules
+  Orchestration
+end note
+
+note top of tasksDao
+  Data Access Object
+  Abstracts data persistence
+  Uses Sequelize ORM
+  Missing retrieveAllTasks() method
+end note
+
+note top of Task
+  Sequelize model
+  Maps to PostgreSQL tasks table
+  Fields: id, title, description, completed, timestamps
+end note
+
+note top of database
+  Sequelize configuration
+  Connection pooling enabled
+  sync() method poisoned
+  Migration-only schema control
+end note
+
+@enduml

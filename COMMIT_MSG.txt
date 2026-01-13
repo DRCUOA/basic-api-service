@@ -1,0 +1,16 @@
+Initial implementation of task management API server
+
+This commit introduces a complete Express.js-based REST API for task management
+with PostgreSQL database integration. The implementation follows a layered
+architecture pattern with clear separation between routes, controllers, services,
+and data access objects (DAOs).
+
+Key features include Express 5.2.1 server with task CRUD endpoints, Sequelize ORM
+integration with PostgreSQL, migration-only schema control (sync() method is
+poisoned for safety), Winston logging system, architecture documentation with
+PlantUML diagrams, environment-based configuration via dotenv, and database
+connection pooling with error handling.
+
+The codebase includes full CRUD operations, defensive programming practices to
+prevent runtime schema mutations, and structured logging. Sequelize CLI is
+configured for migrations, ensuring schema changes are version-controlled.

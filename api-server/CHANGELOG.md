@@ -1,0 +1,27 @@
+# Changelog
+
+All notable changes to this project will be documented in this file.
+
+The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
+and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
+
+## [1.0.0] - 2026-01-13
+
+### Added
+- Initial Express.js API server implementation with task management endpoints
+- PostgreSQL database integration using Sequelize ORM
+- Layered architecture pattern: routes, controllers, services, and DAOs
+- Task CRUD operations (Create, Read, Update, Delete)
+- Winston-based logging system with file and console output
+- Migration-only schema control with poisoned `sync()` method for safety
+- Sequelize CLI configuration for database migrations
+- Comprehensive architecture documentation with PlantUML diagrams
+- Database connection pooling and error handling
+- Environment-based configuration via dotenv
+
+### Technical Details
+- Node.js ES modules (type: "module")
+- Express 5.2.1 framework
+- Sequelize 6.37.7 ORM with PostgreSQL adapter
+- Winston 3.19.0 for structured logging
+- Defensive programming: runtime schema mutation prevention
