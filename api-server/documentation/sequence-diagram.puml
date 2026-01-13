@@ -1,0 +1,85 @@
+@startuml Sequence Diagram - Request Flow
+
+actor Client
+participant "Express App\n(index.js)" as Express
+participant "Database\n(database.js)" as Database
+participant "Routes\n(routes.js)" as Routes
+participant "Task Controller\n(taskController.js)" as Controller
+participant "Task Service\n(taskService.js)" as Service
+participant "Tasks DAO\n(tasksDao.js)" as DAO
+participant "Task Model\n(Task.js)" as TaskModel
+participant "PostgreSQL" as DB
+participant "Logger\n(logger.js)" as Logger
+
+== Application Startup ==
+Express -> Database: getSequelize()
+activate Database
+Database -> Database: Initialize Sequelize\n(poison sync())
+Database --> Express: sequelize instance
+Express -> Database: testConnection()
+Database -> DB: authenticate()
+DB --> Database: connection OK
+Database -> Logger: info("Database connection established")
+Database --> Express: true
+deactivate Database
+
+Express -> Logger: info("API booted with migration-only schema control")
+Express -> Routes: Register /api routes
+
+== Request Flow ==
+Client -> Express: HTTP GET /api/tasks
+activate Express
+
+Express -> Routes: Route request
+activate Routes
+
+Routes -> Controller: listTasks(req, res)
+activate Controller
+
+Controller -> Service: listTasks()
+activate Service
+
+Service -> DAO: retrieveAllTasks()
+activate DAO
+note right of DAO #FFAAAA
+  **BUG**: This function doesn't exist!
+  Should use Task.findAll()
+end note
+
+DAO -> TaskModel: findAll()
+activate TaskModel
+TaskModel -> DB: SELECT * FROM tasks
+DB --> TaskModel: rows[]
+TaskModel --> DAO: Task instances[]
+deactivate TaskModel
+
+DAO -> DAO: Convert to JSON\n(toJSON())
+DAO --> Service: tasks[] (or error)
+deactivate DAO
+
+alt Success
+  Service --> Controller: tasks[]
+  Controller -> Logger: info("Tasks listed successfully: N tasks")
+  activate Logger
+  Logger --> Controller: logged
+  deactivate Logger
+  Controller -> Client: 200 OK + JSON tasks[]
+else Error
+  Service -> Logger: error("Error listing tasks", meta)
+  activate Logger
+  Logger --> Service: logged
+  deactivate Logger
+  Service --> Controller: throws error
+  Controller -> Logger: error("Error listing tasks", meta)
+  activate Logger
+  Logger --> Controller: logged
+  deactivate Logger
+  Controller -> Client: 500 Error + JSON error
+end
+
+deactivate Service
+deactivate Controller
+deactivate Routes
+deactivate Express
+
+@enduml

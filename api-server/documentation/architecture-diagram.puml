@@ -1,0 +1,77 @@
+@startuml Architecture Overview - Layered Architecture Pattern
+
+!define RECTANGLE class
+
+package "Presentation Layer (API)" {
+  [Express App\nindex.js] as ExpressApp
+  [Routes\nroutes.js] as Routes
+  [Task Controller\ntaskController.js] as Controller
+}
+
+package "Domain/Business Layer" {
+  [Task Service\ntaskService.js] as Service
+}
+
+package "Data Access Layer" {
+  [Tasks DAO\ntasksDao.js] as DAO
+  [Task Model\nTask.js] as TaskModel
+  [Database Config\ndatabase.js] as Database
+}
+
+package "Cross-Cutting Concerns" {
+  [Logger\nutils/logger.js] as Logger
+}
+
+database "PostgreSQL Database" {
+  [tasks table] as TasksTable
+}
+
+ExpressApp --> Routes : "uses /api"
+ExpressApp --> Database : "connects to DB"
+Routes --> Controller : "routes HTTP requests"
+Controller --> Service : "calls business logic"
+Controller --> Logger : "logs requests/responses"
+Service --> DAO : "accesses data"
+Service --> Logger : "logs operations"
+DAO --> TaskModel : "uses Sequelize model"
+DAO --> Logger : "logs data access"
+Database --> TaskModel : "provides Sequelize instance"
+TaskModel --> TasksTable : "maps to"
+
+note right of ExpressApp
+  Entry point
+  Sets up Express server
+  Configures JSON middleware
+  Establishes DB connection
+  Enforces migration-only schema
+end note
+
+note right of Controller
+  Handles HTTP requests/responses
+  Error handling
+  Status codes
+  All CRUD methods implemented
+end note
+
+note right of Service
+  Business logic layer
+  Orchestrates operations
+  Validates business rules
+  All CRUD methods implemented
+end note
+
+note right of DAO
+  Data Access Object pattern
+  Uses Sequelize ORM
+  Missing retrieveAllTasks() method
+  Connects to PostgreSQL
+end note
+
+note right of Database
+  Sequelize configuration
+  Connection pooling
+  sync() method poisoned
+  Migration-only schema control
+end note
+
+@enduml
