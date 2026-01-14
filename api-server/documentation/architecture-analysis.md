@@ -153,8 +153,7 @@ PostgreSQL Database
 ### DAO: `tasksDao.js`
 - Provides data access abstraction
 - Uses Sequelize ORM to interact with PostgreSQL database
-- Implements: `retrieveTaskById()`, `createTask()`, `updateTask()`, `deleteTask()`
-- **Note**: `retrieveAllTasks()` method is missing but called by `taskService.listTasks()` - this is a bug
+- Implements: `retrieveAllTasks()`, `retrieveTaskById()`, `createTask()`, `updateTask()`, `deleteTask()`
 - Returns JSON-serialized task objects
 
 ### Logger: `logger.js`
@@ -181,7 +180,7 @@ PostgreSQL Database
 ## Current State
 
 ### ✅ Active Features
-- **GET /api/tasks** - List all tasks (route active, but `retrieveAllTasks()` function missing in DAO)
+- **GET /api/tasks** - List all tasks (fully functional with complete DAO implementation)
 - **Database connection** - Via Sequelize ORM with PostgreSQL
 - **PostgreSQL integration** - Fully configured with connection pooling
 - **Error handling** - Comprehensive error handling and logging
@@ -198,7 +197,6 @@ The following routes are commented out but have full implementation in controlle
 
 | Issue | Severity | Description |
 |-------|----------|-------------|
-| Missing `retrieveAllTasks()` | 🔴 High | `taskService.listTasks()` calls `tasksDao.retrieveAllTasks()` which doesn't exist |
 | Incomplete error handling | 🟡 Medium | `createTask`, `updateTasks`, and `deleteTasks` controllers don't send error responses (only log errors) |
 
 ## Dependencies
@@ -232,8 +230,7 @@ The following routes are commented out but have full implementation in controlle
 ## Recommendations 🎯
 
 ### Critical (Must Fix)
-1. 🔴 **Fix missing function**: Implement `retrieveAllTasks()` in `tasksDao.js` using `Task.findAll()`
-2. 🔴 **Fix error handling**: Add proper error responses in `createTask`, `updateTasks`, and `deleteTasks` controllers
+1. 🔴 **Fix error handling**: Add proper error responses in `createTask`, `updateTasks`, and `deleteTasks` controllers
 
 ### High Priority
 3. 🟠 **Complete CRUD operations**: Uncomment remaining route endpoints (code is already implemented)
