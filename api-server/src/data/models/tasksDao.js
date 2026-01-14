@@ -1,6 +1,19 @@
 import Task from './Task.js';
 import logger from '../../utils/logger.js';
 
+export async function retrieveAllTasks() {
+  try {
+    const tasks = await Task.findAll();
+    return tasks.map(task => task.toJSON());
+  } catch (error) {
+    logger.error('Error retrieving all tasks', {
+      message: error.message,
+      stack: error.stack
+    });
+    throw error;
+  }
+}
+
 export async function retrieveTaskById(id) {
   try {
     const task = await Task.findByPk(id);

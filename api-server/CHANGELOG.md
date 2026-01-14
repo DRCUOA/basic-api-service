@@ -19,6 +19,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Database connection pooling and error handling
 - Environment-based configuration via dotenv
 
+### Fixed
+- Implemented missing `retrieveAllTasks()` function in `tasksDao.js` to fix bug where `taskService.listTasks()` was calling a non-existent DAO method
+
 ### Technical Details
 - Node.js ES modules (type: "module")
 - Express 5.2.1 framework
