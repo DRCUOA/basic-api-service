@@ -15,15 +15,13 @@ const sequelize = new Sequelize(
       max: 5,
       min: 0,
       acquire: 30000,
-      idle: 10000
-    }
+      idle: 10000,
+    },
   }
 );
 
 /**
  * 🔒 HARD BLOCK: prevent schema mutation at runtime
- * This poisons sync() so any attempt to call it will crash the app immediately.
- * This is correct behavior - schema changes must use migrations via sequelize-cli.
  */
 sequelize.sync = () => {
   throw new Error(
@@ -31,7 +29,6 @@ sequelize.sync = () => {
   );
 };
 
-// Environment-based hard rule for extra safety
 if (process.env.NODE_ENV === "production") {
   sequelize.sync = () => {
     throw new Error("sync() forbidden in production");
@@ -39,22 +36,27 @@ if (process.env.NODE_ENV === "production") {
 }
 
 export async function testConnection() {
-  try {
-    await sequelize.authenticate();
-    logger.info("Database connection established successfully.");
-    return true;
-  } catch (error) {
-    logger.error("Unable to connect to database", {
-      message: error.message,
-      stack: error.stack
-    });
-    return false;
+  await sequelize.authenticate();
+  logger.info("Database connection established successfully.");
+}
+
+export async function verifySchema() {
+  const [results] = await sequelize.query(
+    `
+    SELECT COUNT(*) 
+    FROM information_schema.tables 
+    WHERE table_schema = 'public'
+      AND table_name = 'tasks'
+    `
+  );
+
+  if (results[0].count === "0") {
+    throw new Error('Required table "tasks" does not exist');
   }
 }
 
 /**
  * Export ONLY what the app needs
- * This sealed interface prevents direct access to sync() outside this module.
  */
 export function getSequelize() {
   return sequelize;

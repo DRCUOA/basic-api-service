@@ -1,6 +1,6 @@
 import 'dotenv/config';
 import express from "express";
-import { getSequelize, testConnection } from "./data/database.js";
+import { getSequelize, testConnection, verifySchema} from "./data/database.js";
 import logger from "./utils/logger.js";
 import * as tasksDao from "./data/models/tasksDao.js";
 import { createTaskService } from "./domain/taskService.js";
@@ -39,11 +39,20 @@ async function initializeApp() {
       }
     }
 
-    const connected = await testConnection();
-    if (!connected) {
-      logger.error('Failed to connect to database. Exiting...');
+    try {
+      await testConnection();
+      logger.info("Database connection established");
+    
+      await verifySchema();
+      logger.info("Database schema verified");
+    } catch (error) {
+      logger.error("Startup failed", {
+        message: error.message,
+        stack: error.stack,
+      });
       process.exit(1);
     }
+    
 
     logger.info("API booted with migration-only schema control.");
 
