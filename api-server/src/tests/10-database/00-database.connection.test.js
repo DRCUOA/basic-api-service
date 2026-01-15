@@ -1,14 +1,45 @@
 /**
- * Database Guard Tests
- * 
+ * DATABASE CONNECTION AND LIFECYCLE TESTS
+ *
+ * Purpose:
+ * --------
  * These tests validate that the database guard prevents accidental use of
  * non-test databases and that the test database lifecycle works correctly.
+ * They ensure the test environment is properly isolated and configured.
+ *
+ * Why this test is structured this way:
+ * -----------------------------------
+ * - These tests run after the global setup (00-database.config.test.js)
+ *   has initialized the test database.
+ * - They verify both configuration correctness and runtime behavior.
+ * - They check that migrations have been applied and the database is
+ *   in the expected initial state.
+ *
+ * What this test is asserting:
+ * ----------------------------
+ * - The database name contains "test" (guard validation).
+ * - The database configuration matches test environment requirements.
+ * - Authentication with the test database succeeds.
+ * - Required tables (tasks, SequelizeMeta) exist from migrations.
+ * - The create-tasks migration has been recorded.
+ * - The tasks table starts empty (clean state).
+ * - The sync() method is forbidden (prevents accidental schema changes).
+ *
+ * What this test is NOT doing:
+ * ----------------------------
+ * - It does not test database operations on tasks (that's for other test suites).
+ * - It does not verify migration rollback or complex migration scenarios.
+ * - It does not test database connection pooling or performance.
+ *
+ * This test suite establishes the foundation for all other database tests.
+ * If these tests fail, the test environment is not properly configured.
  */
 
 import { describe, it, before } from 'node:test';
 import assert from 'node:assert';
-import { getSequelize } from '../data/database.js';
-import { getTestDbConfig } from './testDbSetup.js';
+import { getSequelize } from '../../data/database.js';
+import { getTestDbConfig } from '../_support/testDbSetup.js';
+
 
 describe('Database Guard and Test Lifecycle', () => {
   let sequelize;

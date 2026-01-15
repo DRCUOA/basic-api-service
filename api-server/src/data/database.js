@@ -1,4 +1,6 @@
-// runtime configuration for Sequelize
+// src/data/database.js
+// Runtime configuration for Sequelize (application DB only)
+
 import { Sequelize } from "sequelize";
 import logger from "../utils/logger.js";
 
@@ -6,9 +8,16 @@ import logger from "../utils/logger.js";
  * HARD GUARD: Prevent tests from running against non-test databases
  * Tests MUST use a database with 'test' in its name
  */
-if (process.env.NODE_ENV === 'test') {
-  const dbName = process.env.DB_NAME || 'basic_api_test';
-  if (!dbName.toLowerCase().includes('test')) {
+if (process.env.NODE_ENV === "test") {
+  const dbName = process.env.DB_NAME;
+
+  if (!dbName) {
+    throw new Error(
+      "DB_NAME must be explicitly set in test environment"
+    );
+  }
+
+  if (!dbName.toLowerCase().includes("test")) {
     throw new Error(
       `FATAL: Test environment MUST use a database with 'test' in the name. ` +
       `Current DB_NAME: "${dbName}". This guard prevents accidental use of dev/prod databases.`
@@ -16,10 +25,25 @@ if (process.env.NODE_ENV === 'test') {
   }
 }
 
+/**
+ * HARD INVARIANTS: No implicit database identity
+ */
+if (!process.env.DB_NAME) {
+  throw new Error("DB_NAME must be explicitly set");
+}
+
+if (!process.env.DB_USER) {
+  throw new Error("DB_USER must be explicitly set");
+}
+
+/**
+ * Sequelize runtime instance (NOT for admin / test DB creation)
+ * Admin DB access must use a separate Sequelize instance
+ */
 const sequelize = new Sequelize(
-  process.env.DB_NAME || (process.env.NODE_ENV === 'test' ? 'basic_api_test' : undefined),
-  process.env.DB_USER || (process.env.NODE_ENV === 'test' ? 'postgres' : undefined),
-  process.env.DB_PASSWORD || (process.env.NODE_ENV === 'test' ? 'testpassword123' : undefined),
+  process.env.DB_NAME,
+  process.env.DB_USER,
+  process.env.DB_PASSWORD || null,
   {
     host: process.env.DB_HOST || "localhost",
     port: process.env.DB_PORT || 5432,
@@ -35,7 +59,8 @@ const sequelize = new Sequelize(
 );
 
 /**
- * HARD BLOCK: prevent schema mutation at runtime (per GH issue 5)
+ * HARD BLOCK: prevent schema mutation at runtime
+ * All schema changes MUST be performed via migrations
  */
 sequelize.sync = () => {
   throw new Error(
@@ -43,27 +68,23 @@ sequelize.sync = () => {
   );
 };
 
-
-/* Commented out per GH issue 5: Explicitly requested to avoid any conditionals on throwing this error
-// Environment-based hard rule for extra safety
-if (process.env.NODE_ENV === "production") 
-  {sequelize.sync = () => 
-    throw new Error("sync() forbidden in production");
-  };
-}
-*/
-
-
+/**
+ * Verify database connectivity
+ */
 export async function testConnection() {
   await sequelize.authenticate();
   logger.info("Database connection established successfully.");
+  return sequelize;
 }
 
+/**
+ * Verify required schema exists (migration safety check)
+ */
 export async function verifySchema() {
   const [results] = await sequelize.query(
     `
-    SELECT COUNT(*) 
-    FROM information_schema.tables 
+    SELECT COUNT(*)
+    FROM information_schema.tables
     WHERE table_schema = 'public'
       AND table_name = 'tasks'
     `
@@ -75,7 +96,7 @@ export async function verifySchema() {
 }
 
 /**
- * Export ONLY what the app needs
+ * Export ONLY what the application needs
  */
 export function getSequelize() {
   return sequelize;
