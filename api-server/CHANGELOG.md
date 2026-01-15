@@ -9,6 +9,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 - Made `sequelize.sync()` override unconditional - removed environment-based conditional check per GH issue 5. The sync() method now throws an error in all environments (dev, test, prod) to prevent accidental runtime schema mutations.
+## [1.1.0] - 2026-01-14
+
+### Added
+- Sequelize migration for creating tasks table (`20260114092302-create-tasks.js`)
+- Schema verification function `verifySchema()` in `database.js` to check required tables exist at startup
+- Startup schema validation in application initialization to ensure database schema is properly set up before accepting requests
+
+### Changed
+- Application startup now verifies database schema integrity before starting the server
+- Enhanced defensive programming: schema verification complements the poisoned `sync()` method
 
 ## [1.0.0] - 2026-01-13
 

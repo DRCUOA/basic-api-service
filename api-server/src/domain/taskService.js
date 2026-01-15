@@ -1,11 +1,8 @@
-// src/domain/taskService.js
-
 export function createTaskService(tasksDao, logger) {
   return {
     async listTasks() {
       try {
-        const tasks = await tasksDao.retrieveAllTasks();
-        return tasks;
+        return await tasksDao.retrieveAllTasks();
       } catch (error) {
         logger.error("Error listing tasks", {
           message: error.message,
@@ -20,8 +17,7 @@ export function createTaskService(tasksDao, logger) {
         if (!taskData.title || taskData.title.trim().length === 0) {
           throw new Error("Task title is required");
         }
-        const task = await tasksDao.createTask(taskData);
-        return task;
+        return await tasksDao.createTask(taskData);
       } catch (error) {
         logger.error("Error creating task", {
           taskData,
