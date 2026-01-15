@@ -29,17 +29,6 @@ sequelize.sync = () => {
   );
 };
 
-
-/* Commented out per GH issue 5: Explicitly requested to avoid any conditionals on throwing this error
-// Environment-based hard rule for extra safety
-if (process.env.NODE_ENV === "production") 
-  {sequelize.sync = () => 
-    throw new Error("sync() forbidden in production");
-  };
-}
-*/
-
-
 export async function testConnection() {
   try {
     await sequelize.authenticate();
