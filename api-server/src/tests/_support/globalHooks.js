@@ -6,7 +6,7 @@
  */
 
 import { setupTestDatabase, teardownTestDatabase } from './testDbSetup.js';
-import { getSequelize } from '../data/database.js';
+import { getSequelize } from '../../data/database.js';
 
 let setupComplete = false;
 let teardownComplete = false;
