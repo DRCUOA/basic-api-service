@@ -21,7 +21,7 @@ const sequelize = new Sequelize(
 );
 
 /**
- * 🔒 HARD BLOCK: prevent schema mutation at runtime
+ * HARD BLOCK: prevent schema mutation at runtime (per GH issue 5)
  */
 sequelize.sync = () => {
   throw new Error(
@@ -29,11 +29,16 @@ sequelize.sync = () => {
   );
 };
 
-if (process.env.NODE_ENV === "production") {
-  sequelize.sync = () => {
+
+/* Commented out per GH issue 5: Explicitly requested to avoid any conditionals on throwing this error
+// Environment-based hard rule for extra safety
+if (process.env.NODE_ENV === "production") 
+  {sequelize.sync = () => 
     throw new Error("sync() forbidden in production");
   };
 }
+*/
+
 
 export async function testConnection() {
   await sequelize.authenticate();
