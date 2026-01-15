@@ -2,10 +2,24 @@
 import { Sequelize } from "sequelize";
 import logger from "../utils/logger.js";
 
+/**
+ * HARD GUARD: Prevent tests from running against non-test databases
+ * Tests MUST use a database with 'test' in its name
+ */
+if (process.env.NODE_ENV === 'test') {
+  const dbName = process.env.DB_NAME || 'basic_api_test';
+  if (!dbName.toLowerCase().includes('test')) {
+    throw new Error(
+      `FATAL: Test environment MUST use a database with 'test' in the name. ` +
+      `Current DB_NAME: "${dbName}". This guard prevents accidental use of dev/prod databases.`
+    );
+  }
+}
+
 const sequelize = new Sequelize(
-  process.env.DB_NAME,
-  process.env.DB_USER,
-  process.env.DB_PASSWORD || null,
+  process.env.DB_NAME || (process.env.NODE_ENV === 'test' ? 'basic_api_test' : undefined),
+  process.env.DB_USER || (process.env.NODE_ENV === 'test' ? 'postgres' : undefined),
+  process.env.DB_PASSWORD || (process.env.NODE_ENV === 'test' ? 'testpassword123' : undefined),
   {
     host: process.env.DB_HOST || "localhost",
     port: process.env.DB_PORT || 5432,
