@@ -7,6 +7,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+- Test database lifecycle infrastructure with automated setup and teardown utilities (`testDbSetup.js`)
+- Global test hooks for database initialization and cleanup (`globalHooks.js`, `00-setup.test.js`, `zz-teardown.test.js`)
+- Database guard tests validating `sequelize.sync()` override throws errors as expected (`databaseGuardRejection.test.js`)
+- Database connection and schema validation tests verifying test database configuration and migration state (`database.test.js`)
+- Test database safety guard ensuring only databases with "test" in the name can be used in test mode
+
 ### Changed
 - Made `sequelize.sync()` override unconditional - removed environment-based conditional check per GH issue 5. The sync() method now throws an error in all environments (dev, test, prod) to prevent accidental runtime schema mutations.
 ## [1.1.0] - 2026-01-14
