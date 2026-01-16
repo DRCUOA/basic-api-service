@@ -55,6 +55,9 @@ This document tracks explicit changes between structure file versions.
 | 1.2 → 1.3 | Fri 16 Jan 2026 10:27:04 NZDT | Added | `documentation/structure1_3.md` | New structure documentation snapshot |
 | 1.2 → 1.3 | Fri 16 Jan 2026 10:27:04 NZDT | Changed | Test structure organization | Reorganized from flat `src/test/` to hierarchical `src/tests/` with numbered directories |
 | 1.2 → 1.3 | Fri 16 Jan 2026 10:27:04 NZDT | Changed | Test file naming | Renamed files for clarity (e.g., `databaseGuardRejection.test.js` → `01-database.guardrails.test.js`) |
+| 1.3 → 1.31 | Fri 16 Jan 2026 17:26:34 NZDT | Removed | `CHANGELOG.md` | Removed from root level of api-server |
+| 1.31 → 1.32 | Fri 16 Jan 2026 17:31:56 NZDT | Added | `CHANGELOG.md` | Added back at root level of api-server |
+| 1.31 → 1.32 | Fri 16 Jan 2026 17:31:56 NZDT | Added | `structure-changelog.md` | Added at root level of api-server |
 
 ## Machine-Readable Format (JSON)
 
@@ -321,6 +324,33 @@ This document tracks explicit changes between structure file versions.
           "type": "changed",
           "path": "Test file naming",
           "description": "Renamed files for clarity (e.g., databaseGuardRejection.test.js → 01-database.guardrails.test.js)"
+        }
+      ]
+    },
+    "1.3_to_1.31": {
+      "version": "1.3 → 1.31",
+      "date": "Fri 16 Jan 2026 17:26:34 NZDT",
+      "changes": [
+        {
+          "type": "removed",
+          "path": "CHANGELOG.md",
+          "description": "Removed from root level of api-server"
+        }
+      ]
+    },
+    "1.31_to_1.32": {
+      "version": "1.31 → 1.32",
+      "date": "Fri 16 Jan 2026 17:31:56 NZDT",
+      "changes": [
+        {
+          "type": "added",
+          "path": "CHANGELOG.md",
+          "description": "Added back at root level of api-server"
+        },
+        {
+          "type": "added",
+          "path": "structure-changelog.md",
+          "description": "Added at root level of api-server"
         }
       ]
     }

@@ -4,18 +4,21 @@
 
 package "Presentation Layer (API)" {
   [Express App\nindex.js] as ExpressApp
-  [Routes\nroutes.js] as Routes
-  [Task Controller\ntaskController.js] as Controller
+  [Routes Factory\nroutes.js] as Routes
+  [Task Controller Factory\ntaskController.js] as ControllerFactory
+  [Task Controller Instance] as Controller
 }
 
 package "Domain/Business Layer" {
-  [Task Service\ntaskService.js] as Service
+  [Task Service Factory\ntaskService.js] as ServiceFactory
+  [Task Service Instance] as Service
 }
 
 package "Data Access Layer" {
   [Tasks DAO\ntasksDao.js] as DAO
   [Task Model\nTask.js] as TaskModel
-  [Database Config\ndatabase.js] as Database
+  [Database Runtime\ndata/database.js] as Database
+  [Database Config CLI\ndata/config/database.js] as DatabaseConfig
 }
 
 package "Cross-Cutting Concerns" {
@@ -26,8 +29,10 @@ database "PostgreSQL Database" {
   [tasks table] as TasksTable
 }
 
-ExpressApp --> Routes : "uses /api"
-ExpressApp --> Database : "connects to DB"
+ExpressApp --> Routes : "creates router with\n/api prefix"
+ExpressApp --> Database : "getSequelize()\ntestConnection()\nverifySchema()"
+ExpressApp --> ControllerFactory : "createTaskController()"
+ExpressApp --> ServiceFactory : "createTaskService()"
 Routes --> Controller : "routes HTTP requests"
 Controller --> Service : "calls business logic"
 Controller --> Logger : "logs requests/responses"
@@ -36,6 +41,7 @@ Service --> Logger : "logs operations"
 DAO --> TaskModel : "uses Sequelize model"
 DAO --> Logger : "logs data access"
 Database --> TaskModel : "provides Sequelize instance"
+DatabaseConfig ..> Database : "CLI config only\n(sequelize-cli)"
 TaskModel --> TasksTable : "maps to"
 
 note right of ExpressApp
@@ -43,35 +49,54 @@ note right of ExpressApp
   Sets up Express server
   Configures JSON middleware
   Establishes DB connection
+  Verifies schema exists
   Enforces migration-only schema
+  Factory pattern for DI
 end note
 
 note right of Controller
+  Factory function pattern
   Handles HTTP requests/responses
   Error handling
   Status codes
-  All CRUD methods implemented
+  All CRUD methods implemented:
+  - listTasks
+  - createTask
+  - updateTasks
+  - deleteTasks
 end note
 
 note right of Service
+  Factory function pattern
   Business logic layer
   Orchestrates operations
   Validates business rules
-  All CRUD methods implemented
+  All CRUD methods implemented:
+  - listTasks
+  - createTask
+  - updateTasks
+  - deleteTasks
 end note
 
 note right of DAO
   Data Access Object pattern
   Uses Sequelize ORM
-  Missing retrieveAllTasks() method
+  All methods implemented:
+  - retrieveAllTasks
+  - retrieveTaskById
+  - createTask
+  - updateTask
+  - deleteTask
   Connects to PostgreSQL
 end note
 
 note right of Database
-  Sequelize configuration
-  Connection pooling
+  Sequelize runtime configuration
+  Connection pooling enabled
   sync() method poisoned
   Migration-only schema control
+  verifySchema() checks table exists
+  Test environment guardrails
 end note
 
 @enduml

@@ -6,8 +6,12 @@
   "type": "module",
   "scripts": {
     "dev": "nodemon src/index.js",
-    "test": "NODE_ENV=test node --test",
-    "test:watch": "NODE_ENV=test node --test --watch"
+    "test": "NODE_ENV=test node --test \"src/tests/**/*.test.js\"",
+    "test:watch": "NODE_ENV=test node --test --watch \"src/tests/**/*.test.js\"",
+    "test:invariants": "NODE_ENV=test node --test \"src/tests/00-invariants/**/*.test.js\"",
+    "test:database": "NODE_ENV=test node --test \"src/tests/10-database/**/*.test.js\"",
+    "test:setup": "NODE_ENV=test node --test src/tests/00-invariants/00-database.config.test.js",
+    "test:teardown": "NODE_ENV=test node --test \"src/tests/zz-teardown/**/*.test.js\""
   },
   "keywords": [],
   "author": "",

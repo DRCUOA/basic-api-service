@@ -3,7 +3,7 @@
 actor Client
 participant "Express App\n(index.js)" as Express
 participant "Database\n(database.js)" as Database
-participant "Routes\n(routes.js)" as Routes
+participant "Routes Factory\n(routes.js)" as RoutesFactory
 participant "Task Controller\n(taskController.js)" as Controller
 participant "Task Service\n(taskService.js)" as Service
 participant "Tasks DAO\n(tasksDao.js)" as DAO
@@ -21,19 +21,34 @@ Database -> DB: authenticate()
 DB --> Database: connection OK
 Database -> Logger: info("Database connection established")
 Database --> Express: true
+
+Express -> Database: verifySchema()
+Database -> DB: SELECT COUNT(*) FROM information_schema.tables\nWHERE table_name = 'tasks'
+DB --> Database: count result
+alt Table exists
+  Database --> Express: schema verified
+else Table missing
+  Database --> Express: throws Error("tasks table does not exist")
+end
 deactivate Database
 
+Express -> Logger: info("Database schema verified")
 Express -> Logger: info("API booted with migration-only schema control")
-Express -> Routes: Register /api routes
+Express -> RoutesFactory: routes({ taskController })
+activate RoutesFactory
+RoutesFactory -> RoutesFactory: Create Express Router\nRegister all routes
+RoutesFactory --> Express: router instance
+deactivate RoutesFactory
+Express -> Express: app.use("/api", router)
 
 == Request Flow ==
 Client -> Express: HTTP GET /api/tasks
 activate Express
 
-Express -> Routes: Route request
-activate Routes
+Express -> RoutesFactory: Route request
+activate RoutesFactory
 
-Routes -> Controller: listTasks(req, res)
+RoutesFactory -> Controller: listTasks(req, res)
 activate Controller
 
 Controller -> Service: listTasks()
@@ -41,10 +56,6 @@ activate Service
 
 Service -> DAO: retrieveAllTasks()
 activate DAO
-note right of DAO #FFAAAA
-  **BUG**: This function doesn't exist!
-  Should use Task.findAll()
-end note
 
 DAO -> TaskModel: findAll()
 activate TaskModel
@@ -53,7 +64,7 @@ DB --> TaskModel: rows[]
 TaskModel --> DAO: Task instances[]
 deactivate TaskModel
 
-DAO -> DAO: Convert to JSON\n(toJSON())
+DAO -> DAO: Convert to JSON\n(tasks.map(task => task.toJSON()))
 DAO --> Service: tasks[] (or error)
 deactivate DAO
 
@@ -79,7 +90,42 @@ end
 
 deactivate Service
 deactivate Controller
-deactivate Routes
+deactivate RoutesFactory
+deactivate Express
+
+== Create Task Flow ==
+Client -> Express: HTTP POST /api/tasks\n{ title, description, completed }
+activate Express
+Express -> RoutesFactory: Route request
+activate RoutesFactory
+RoutesFactory -> Controller: createTask(req, res)
+activate Controller
+Controller -> Service: createTask(req.body)
+activate Service
+Service -> Service: Validate title required
+alt Valid
+  Service -> DAO: createTask(taskData)
+  activate DAO
+  DAO -> TaskModel: create(taskData)
+  activate TaskModel
+  TaskModel -> DB: INSERT INTO tasks ...
+  DB --> TaskModel: new task
+  TaskModel --> DAO: Task instance
+  deactivate TaskModel
+  DAO -> DAO: Convert to JSON
+  DAO --> Service: task
+  deactivate DAO
+  Service --> Controller: task
+  Controller -> Logger: info("Task created successfully: id")
+  Controller -> Client: 201 Created + JSON task
+else Invalid
+  Service --> Controller: throws Error("Task title is required")
+  Controller -> Logger: error("Error creating task", meta)
+  Controller -> Client: 500 Error + JSON error
+end
+deactivate Service
+deactivate Controller
+deactivate RoutesFactory
 deactivate Express
 
 @enduml
