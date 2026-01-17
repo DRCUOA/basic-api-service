@@ -4,25 +4,33 @@ skinparam classAttributeIconSize 0
 
 package "api/routes" {
   class routes {
-    + router: Router
+    + routes({ taskController }): Router
     + get("/tasks"): listTasks
-    + post("/tasks"): createTask (commented)
-    + patch("/tasks/:id"): updateTasks (commented)
-    + delete("/tasks/:id"): deleteTasks (commented)
+    + post("/tasks"): createTask
+    + patch("/tasks/:id"): updateTasks
+    + delete("/tasks/:id"): deleteTasks
   }
 }
 
 package "api/controllers" {
-  class taskController {
+  class createTaskController {
+    + createTaskController(taskService, logger): TaskController
+  }
+  
+  class TaskController {
     + listTasks(req, res): Promise<void>
     + createTask(req, res): Promise<void>
     + updateTasks(req, res): Promise<void>
-    + deleteTasks(req, res): Promise<void>
+       + deleteTasks(req, res): Promise<void>
   }
 }
 
 package "domain" {
-  class taskService {
+  class createTaskService {
+    + createTaskService(tasksDao, logger): TaskService
+  }
+  
+  class TaskService {
     + listTasks(): Promise<Task[]>
     + createTask(data): Promise<Task>
     + updateTasks(id, data): Promise<Task>
@@ -32,11 +40,11 @@ package "domain" {
 
 package "data/models" {
   class tasksDao {
+    + retrieveAllTasks(): Promise<Task[]>
     + retrieveTaskById(id): Promise<Task|null>
     + createTask(taskData): Promise<Task>
     + updateTask(id, updates): Promise<Task|null>
     + deleteTask(id): Promise<boolean>
-    - Note: retrieveAllTasks() missing but called by service
   }
   
   class Task {
@@ -49,6 +57,9 @@ package "data/models" {
     + findByPk(id): Promise<Task>
     + create(data): Promise<Task>
     + findAll(): Promise<Task[]>
+    + update(updates): Promise<void>
+    + destroy(): Promise<void>
+    + toJSON(): Object
   }
 }
 
@@ -64,7 +75,6 @@ package "Root" {
     + app: Express
     + PORT: number
     + initializeApp(): Promise<void>
-    + testConnection(): Promise<boolean>
     + listen(): void
   }
 }
@@ -73,56 +83,80 @@ package "data" {
   class database {
     + getSequelize(): Sequelize
     + testConnection(): Promise<boolean>
+    + verifySchema(): Promise<void>
     - sequelize.sync(): Error (poisoned)
+  }
+  
+  class databaseConfig {
+    + development: Config
+    + test: Config
   }
 }
 
-index --> routes : uses
+index --> routes : creates router
 index --> database : connects to
-routes --> taskController : routes to
-taskController --> taskService : calls
-taskController --> logger : uses
-taskService --> tasksDao : calls
-taskService --> logger : uses
+index --> createTaskController : creates controller
+index --> createTaskService : creates service
+routes --> TaskController : routes to
+createTaskController --> TaskController : creates
+createTaskController --> TaskService : depends on
+createTaskController --> logger : depends on
+TaskController --> TaskService : calls
+TaskController --> logger : uses
+createTaskService --> TaskService : creates
+createTaskService --> tasksDao : depends on
+createTaskService --> logger : depends on
+TaskService --> tasksDao : calls
+TaskService --> logger : uses
 tasksDao --> Task : uses Sequelize model
 tasksDao --> logger : uses
 database --> Task : provides Sequelize instance
+databaseConfig ..> database : CLI config only
 
 note top of routes
+  Factory function
   HTTP Route definitions
   Maps URLs to controller functions
+  All routes active
 end note
 
-note top of taskController
+note top of TaskController
+  Factory function pattern
   Request/Response handling
   HTTP status codes
   Error handling
+  Dependency injection
 end note
 
-note top of taskService
+note top of TaskService
+  Factory function pattern
   Business logic layer
   Domain rules
   Orchestration
+  Dependency injection
 end note
 
 note top of tasksDao
   Data Access Object
   Abstracts data persistence
   Uses Sequelize ORM
-  Missing retrieveAllTasks() method
+  All methods implemented
 end note
 
 note top of Task
   Sequelize model
   Maps to PostgreSQL tasks table
   Fields: id, title, description, completed, timestamps
+  Validation on title field
 end note
 
 note top of database
-  Sequelize configuration
+  Sequelize runtime configuration
   Connection pooling enabled
   sync() method poisoned
   Migration-only schema control
+  verifySchema() checks table exists
+  Test environment guardrails
 end note
 
 @enduml
