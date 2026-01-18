@@ -58,10 +58,10 @@ This document tracks explicit changes between structure file versions.
 | 1.3 → 1.31 | Fri 16 Jan 2026 17:26:34 NZDT | Removed | `CHANGELOG.md` | Removed from root level of api-server |
 | 1.31 → 1.32 | Fri 16 Jan 2026 17:31:56 NZDT | Added | `CHANGELOG.md` | Added back at root level of api-server |
 | 1.31 → 1.32 | Fri 16 Jan 2026 17:31:56 NZDT | Added | `structure-changelog.md` | Added at root level of api-server |
-| 1.3 → 1.4 | Sun 18 Jan 2026 12:28:13 NZDT | Added | `src/tests/_support/testEnvLoader.js` | Test environment loader utility for loading test configuration |
-| 1.3 → 1.4 | Sun 18 Jan 2026 12:28:13 NZDT | Added | `src/tests/README-TESTS.md` | Comprehensive test documentation and guidelines |
-| 1.3 → 1.4 | Sun 18 Jan 2026 12:28:13 NZDT | Added | `structure-changelog.md` | Structure changelog file now visible in structure tree |
-| 1.3 → 1.4 | Sun 18 Jan 2026 12:28:13 NZDT | Added | `documentation/00-history/structure1_4.md` | New structure documentation snapshot |
+| 1.32 → 1.4 | Sun 18 Jan 2026 12:28:13 NZDT | Added | `src/tests/_support/testEnvLoader.js` | Test environment loader utility for loading test configuration |
+| 1.32 → 1.4 | Sun 18 Jan 2026 12:28:13 NZDT | Added | `src/tests/README-TESTS.md` | Comprehensive test documentation and guidelines |
+| 1.32 → 1.4 | Sun 18 Jan 2026 12:28:13 NZDT | Added | `structure-changelog.md` | Structure changelog file now visible in structure tree |
+| 1.32 → 1.4 | Sun 18 Jan 2026 12:28:13 NZDT | Added | `documentation/00-history/structure1_4.md` | New structure documentation snapshot |
 
 ## Machine-Readable Format (JSON)
 
