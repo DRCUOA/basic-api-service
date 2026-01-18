@@ -62,6 +62,16 @@ This document tracks explicit changes between structure file versions.
 | 1.32 → 1.4 | Sun 18 Jan 2026 12:28:13 NZDT | Added | `src/tests/README-TESTS.md` | Comprehensive test documentation and guidelines |
 | 1.32 → 1.4 | Sun 18 Jan 2026 12:28:13 NZDT | Added | `structure-changelog.md` | Structure changelog file now visible in structure tree |
 | 1.32 → 1.4 | Sun 18 Jan 2026 12:28:13 NZDT | Added | `documentation/00-history/structure1_4.md` | New structure documentation snapshot |
+| 1.4 → 1.5 | Sun 18 Jan 2026 22:28:44 NZDT | Added | `config/` | New root-level config directory for CommonJS Sequelize CLI config |
+| 1.4 → 1.5 | Sun 18 Jan 2026 22:28:44 NZDT | Added | `config/config.cjs` | CommonJS configuration file for Sequelize CLI compatibility |
+| 1.4 → 1.5 | Sun 18 Jan 2026 22:28:44 NZDT | Added | `src/config/` | New config directory for dynamic config generation |
+| 1.4 → 1.5 | Sun 18 Jan 2026 22:28:44 NZDT | Added | `src/config/config.cjs` | CommonJS backup config file for Sequelize CLI |
+| 1.4 → 1.5 | Sun 18 Jan 2026 22:28:44 NZDT | Added | `src/config/config.json` | Dynamically generated config file for Sequelize CLI (created at test runtime) |
+| 1.4 → 1.5 | Sun 18 Jan 2026 22:28:44 NZDT | Changed | `src/data/config/database.js` → `src/data/config/database.cjs` | Converted to CommonJS for Sequelize CLI compatibility |
+| 1.4 → 1.5 | Sun 18 Jan 2026 22:28:44 NZDT | Changed | `src/database/migrations/20260114092302-create-tasks.js` → `20260114092302-create-tasks.cjs` | Converted migration to CommonJS for Sequelize CLI compatibility |
+| 1.4 → 1.5 | Sun 18 Jan 2026 22:28:44 NZDT | Added | `structure.md` | Current structure snapshot at root level |
+| 1.4 → 1.5 | Sun 18 Jan 2026 22:28:44 NZDT | Added | `documentation/40-structure/structure1_5.md` | New structure documentation snapshot |
+| 1.4 → 1.5 | Sun 18 Jan 2026 22:28:44 NZDT | Added | `documentation/00-history/structure1_5.md` | Historical structure snapshot for version 1.5 |
 
 ## Machine-Readable Format (JSON)
 
@@ -381,6 +391,62 @@ This document tracks explicit changes between structure file versions.
           "type": "added",
           "path": "documentation/00-history/structure1_4.md",
           "description": "New structure documentation snapshot"
+        }
+      ]
+    },
+    "1.4_to_1.5": {
+      "version": "1.4 → 1.5",
+      "date": "Sun 18 Jan 2026 22:28:44 NZDT",
+      "changes": [
+        {
+          "type": "added",
+          "path": "config/",
+          "description": "New root-level config directory for CommonJS Sequelize CLI config"
+        },
+        {
+          "type": "added",
+          "path": "config/config.cjs",
+          "description": "CommonJS configuration file for Sequelize CLI compatibility"
+        },
+        {
+          "type": "added",
+          "path": "src/config/",
+          "description": "New config directory for dynamic config generation"
+        },
+        {
+          "type": "added",
+          "path": "src/config/config.cjs",
+          "description": "CommonJS backup config file for Sequelize CLI"
+        },
+        {
+          "type": "added",
+          "path": "src/config/config.json",
+          "description": "Dynamically generated config file for Sequelize CLI (created at test runtime)"
+        },
+        {
+          "type": "changed",
+          "path": "src/data/config/database.js → src/data/config/database.cjs",
+          "description": "Converted to CommonJS for Sequelize CLI compatibility"
+        },
+        {
+          "type": "changed",
+          "path": "src/database/migrations/20260114092302-create-tasks.js → 20260114092302-create-tasks.cjs",
+          "description": "Converted migration to CommonJS for Sequelize CLI compatibility"
+        },
+        {
+          "type": "added",
+          "path": "structure.md",
+          "description": "Current structure snapshot at root level"
+        },
+        {
+          "type": "added",
+          "path": "documentation/40-structure/structure1_5.md",
+          "description": "New structure documentation snapshot"
+        },
+        {
+          "type": "added",
+          "path": "documentation/00-history/structure1_5.md",
+          "description": "Historical structure snapshot for version 1.5"
         }
       ]
     }

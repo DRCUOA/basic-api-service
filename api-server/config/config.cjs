@@ -1,7 +1,8 @@
 // CLI configuration for Sequelize
-import 'dotenv/config';
+// This file uses CommonJS for Sequelize CLI compatibility
+require('dotenv/config');
 
-export default {
+module.exports = {
   development: {
     username: process.env.DB_USER,
     password: process.env.DB_PASSWORD || undefined,

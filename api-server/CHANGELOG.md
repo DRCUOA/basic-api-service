@@ -7,6 +7,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Fixed
+- **Sequelize CLI compatibility with ES modules**: Implemented hybrid ESM/CommonJS boundary to resolve Sequelize CLI configuration loading issues
+  - Created CommonJS config files (`database.cjs`, `config.cjs`) for Sequelize CLI tooling while maintaining ESM for application runtime
+  - Converted migration file from `.js` to `.cjs` for CommonJS compatibility
+  - Updated `.sequelizerc` to use `__dirname` for absolute path resolution
+  - Added dynamic `config.json` generation at test runtime from environment variables
+  - Fixed path resolution in test setup (corrected `apiServerPath` calculation)
+  - Made test database setup idempotent (checks before dropping to prevent connection termination errors)
+  - Removed database drop from teardown to prevent interference with parallel test execution
+  - Added concurrency protection to prevent multiple simultaneous setup calls
+  - Fixed log file path resolution in test setup
+
 ### Added
 - Organized test structure with numbered directories (`00-invariants/`, `10-database/`, `20-domain/`, `30-api/`, `40-integration/`, `zz-teardown/`) for clear test execution order
 - Comprehensive test file header comments following detailed documentation pattern with Purpose, structure rationale, assertions, and scope boundaries

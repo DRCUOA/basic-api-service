@@ -163,13 +163,16 @@ PostgreSQL Database
 - JSON format for structured logging
 - Timestamp format: DD-MM-YYYY HH:mm:ss
 
-### Database: `database.js` & `config/database.js`
-- Sequelize ORM configuration
+### Database: `database.js` & `config/database.cjs`
+- **Runtime config** (`src/data/database.js`): Sequelize ORM configuration for application (ESM)
+- **CLI config** (`src/data/config/database.cjs`): Sequelize CLI configuration for migrations (CommonJS)
+- **Dynamic config** (`src/config/config.json`): Generated at test runtime from environment variables
 - PostgreSQL database connection
 - Connection pooling configured (max: 5, min: 0)
 - Environment-based configuration via `.env` file
 - **Critical**: `sync()` method is intentionally poisoned to prevent runtime schema mutations
 - Schema changes must use migrations via sequelize-cli
+- **Hybrid approach**: ESM for application, CommonJS for Sequelize CLI tooling compatibility
 
 ### Task Model: `Task.js`
 - Sequelize model definition

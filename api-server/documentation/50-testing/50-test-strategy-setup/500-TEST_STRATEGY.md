@@ -242,10 +242,13 @@ describe('Test Suite', () => {
 
 ### 4. Database Configuration
 
-- Single source: `src/data/config/database.js`
+- **Runtime config**: `src/data/database.js` (ESM for application)
+- **CLI config**: `src/data/config/database.cjs` (CommonJS for Sequelize CLI)
+- **Dynamic config**: `src/config/config.json` (generated at test runtime from environment variables)
 - Test configuration inherits from base config
 - Guards ensure test database naming
 - Consistent connection pooling
+- Hybrid ESM/CommonJS approach maintains compatibility with Sequelize CLI
 
 ## Maintaining Consistency as Code Grows
 

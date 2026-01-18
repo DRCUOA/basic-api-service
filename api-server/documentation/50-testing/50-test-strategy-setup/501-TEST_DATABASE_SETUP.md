@@ -131,9 +131,9 @@ The test infrastructure **automatically manages** the test database lifecycle:
 
 1. **Setup Phase** (before tests run):
    - Connects to `postgres` system database
-   - Terminates any existing connections to the test database
-   - Drops the test database if it exists
-   - Creates a fresh test database
+   - Checks if test database exists and has correct schema
+   - Creates database only if it doesn't exist (idempotent setup)
+   - Generates `config.json` dynamically from environment variables for Sequelize CLI
    - Runs migrations to create schema (creates `tasks` table and `SequelizeMeta` table)
    - Verifies database is ready
 
@@ -142,9 +142,9 @@ The test infrastructure **automatically manages** the test database lifecycle:
    - Each test run starts with an empty database
 
 3. **Teardown Phase** (after tests complete):
-   - Closes all database connections
-   - Drops the test database
-   - Cleans up resources
+   - Leaves database intact (prevents connection termination errors during parallel test execution)
+   - Database is dropped/recreated fresh at the start of each test run anyway
+   - Connections remain open until process exits
 
 ### What You DON'T Need to Do
 
@@ -180,6 +180,8 @@ The test infrastructure expects the following tables to be created via migration
 ### Migration Location
 
 Migrations are located in: `api-server/src/database/migrations/`
+
+**Note:** Migration files use `.cjs` extension (CommonJS) for Sequelize CLI compatibility, while the application uses ES modules. This hybrid approach allows Sequelize CLI to load migrations while keeping the application codebase in ESM.
 
 The test infrastructure automatically runs migrations during setup.
 
@@ -307,7 +309,20 @@ ALTER USER test_user WITH PASSWORD 'new_password';
 
 ## Additional Resources
 
-- Migration files: `api-server/src/database/migrations/`
+- Migration files: `api-server/src/database/migrations/` (CommonJS `.cjs` files for Sequelize CLI)
 - Test setup code: `api-server/src/tests/_support/testDbSetup.js`
-- Database configuration: `api-server/src/data/config/database.js`
+- Database runtime config: `api-server/src/data/database.js` (ESM for application)
+- Sequelize CLI config: `api-server/src/data/config/database.cjs` (CommonJS for CLI tooling)
+- Dynamic config generation: `api-server/src/config/config.json` (generated at test runtime)
 - Test guard logic: `api-server/src/data/database.js`
+
+## Technical Note: ESM/CommonJS Hybrid Approach
+
+The project uses ES modules (`"type": "module"`), but Sequelize CLI requires CommonJS. To resolve this:
+
+- **Application runtime**: Uses ESM (`database.js`)
+- **Sequelize CLI tooling**: Uses CommonJS (`database.cjs`, migration `.cjs` files)
+- **Dynamic config**: `config.json` is generated at test runtime from environment variables
+- **Tooling boundary**: Migrations and CLI config are isolated from the ESM application
+
+This hybrid approach maintains ESM for the application while providing CommonJS compatibility for Sequelize CLI.

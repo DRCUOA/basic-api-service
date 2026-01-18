@@ -1,0 +1,18 @@
+{
+  "development": {
+    "username": "nzwa_test_user_1",
+    "password": "AjBV4rkx",
+    "database": "basic_api_test",
+    "host": "localhost",
+    "port": 5432,
+    "dialect": "postgres"
+  },
+  "test": {
+    "username": "nzwa_test_user_1",
+    "password": "AjBV4rkx",
+    "database": "basic_api_test",
+    "host": "localhost",
+    "port": 5432,
+    "dialect": "postgres"
+  }
+}

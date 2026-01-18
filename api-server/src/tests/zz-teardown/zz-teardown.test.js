@@ -31,6 +31,10 @@
  * If teardown fails, subsequent test runs may encounter state pollution.
  */
 
+// CRITICAL: Load test environment variables FIRST, before any other imports
+// This ensures .env.test is loaded when NODE_ENV=test
+import '../_support/testEnvLoader.js';
+
 import { after } from 'node:test';
 import { globalTeardown } from '../_support/globalHooks.js';
 

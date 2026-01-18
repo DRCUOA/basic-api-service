@@ -5,17 +5,32 @@
  * It exports hooks that will be registered by test files.
  */
 
+// CRITICAL: Load test environment variables FIRST, before any other imports
+// This ensures .env.test is loaded when NODE_ENV=test
+import './testEnvLoader.js';
+
 import { setupTestDatabase, teardownTestDatabase } from './testDbSetup.js';
 import { getSequelize } from '../../data/database.js';
 
 let setupComplete = false;
 let teardownComplete = false;
+let setupInProgress = false;
 
 /**
  * Global setup function - call this before any tests run
  */
 export async function globalSetup() {
+  // Prevent concurrent setup calls
+  if (setupInProgress) {
+    // Wait for setup to complete
+    while (setupInProgress) {
+      await new Promise(resolve => setTimeout(resolve, 100));
+    }
+    return;
+  }
+  
   if (!setupComplete) {
+    setupInProgress = true;
     console.log('\n🔧 Global Test Setup: Initializing test database...\n');
     
     try {
@@ -25,6 +40,8 @@ export async function globalSetup() {
     } catch (error) {
       console.error('❌ Failed to initialize test database:', error);
       throw error;
+    } finally {
+      setupInProgress = false;
     }
   }
 }

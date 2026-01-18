@@ -1,15 +1,17 @@
 const path = require('path');
 
 // This configuration file tells Sequelize CLI where to find important directories and files.
-// It uses Node's 'path' module to generate absolute paths to avoid path resolution issues.
+// Paths are resolved relative to where Sequelize CLI runs (the project root where this file is located).
 
 module.exports = {
   // Path to the database configuration file
-  config: path.resolve('src/data/config/database.js'),
+  // Using JSON format as fallback - Sequelize CLI seems to expect this location
+  // Note: This will be overridden by environment variables at runtime
+  config: path.resolve(__dirname, 'src/config/config.json'),
   // Path to the folder containing Sequelize models
-  modelsPath: path.resolve('src/data/models'),
-  // Path to the folder where migration files are stored
-  migrationsPath: path.resolve('src/database/migrations'),
+  modelsPath: path.resolve(__dirname, 'src/data/models'),
+  // Path to the folder where migration files are stored (CommonJS for Sequelize CLI)
+  migrationsPath: path.resolve(__dirname, 'src/database/migrations'),
   // Path to the folder where seed files are stored
-  seedersPath: path.resolve('src/database/seeders')
+  seedersPath: path.resolve(__dirname, 'src/database/seeders')
 };
