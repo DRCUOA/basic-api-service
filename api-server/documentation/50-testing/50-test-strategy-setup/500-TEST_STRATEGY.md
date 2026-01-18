@@ -8,6 +8,7 @@ This document outlines the testing strategy and how it maintains consistency and
 
 ### 0. Three Distinct Execution Phases
 
+*Note: This section intentionally uses zero-based numbering to model the execution lifecycle starting at phase 0 during module evaluation.*
 **Critical: These phases must NOT leak into each other:**
 
 1. **Node Module Evaluation (Imports)**
