@@ -34,6 +34,10 @@
  * If setup fails, all subsequent tests will fail or behave unpredictably.
  */
 
+// CRITICAL: Load test environment variables FIRST, before any other imports
+// This ensures .env.test is loaded when NODE_ENV=test
+import '../_support/testEnvLoader.js';
+
 import { before } from 'node:test';
 import { globalSetup } from '../_support/globalHooks.js';
 
