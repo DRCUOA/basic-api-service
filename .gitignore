@@ -156,3 +156,6 @@ vite.config.ts.timestamp-*
 # Logs directory (already covered by logs above, but being explicit)
 logs/
 **/logs/
+
+# Dynamically generated config files
+api-server/src/config/config.json

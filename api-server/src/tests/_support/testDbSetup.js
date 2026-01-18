@@ -141,98 +141,21 @@ export async function runMigrations() {
   
   try {
     const apiServerPath = path.resolve(__dirname, '../../../');
-    
-    // #region agent log
     const fs = await import('fs');
-    const logPath = path.resolve(apiServerPath, '../.cursor/debug.log');
-    const logDir = path.dirname(logPath);
-    // Ensure log directory exists
-    if (!fs.existsSync(logDir)) {
-      fs.mkdirSync(logDir, { recursive: true });
-    }
-    const safeAppendLog = (logData) => {
-      try {
-        fs.appendFileSync(logPath, JSON.stringify(logData) + '\n');
-      } catch (err) {
-        // Log file write failed, but continue - fetch will still work
-      }
-    };
-    const logEntry = {location:'testDbSetup.js:132',message:'runMigrations entry',data:{apiServerPath,config:config.database,username:config.username},timestamp:Date.now(),sessionId:'debug-session',runId:'post-fix'};
-    safeAppendLog(logEntry);
-    fetch('http://127.0.0.1:7243/ingest/b28ba336-f278-4fcf-939d-745bab84e580',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(logEntry)}).catch(()=>{});
-    // #endregion
     
     console.log(`✓ Running migrations on test database "${config.database}"...`);
-    console.log(`  Working directory: ${apiServerPath}`);
-    
-    // #region agent log
-    const configPath = path.resolve(apiServerPath, 'src/data/config/database.cjs');
-    const sequelizercPath = path.resolve(apiServerPath, '.sequelizerc');
-    const migrationsDir = path.resolve(apiServerPath, 'src/database/migrations');
-    const configExists = fs.existsSync(configPath);
-    const sequelizercExists = fs.existsSync(sequelizercPath);
-    const migrationsExist = fs.existsSync(migrationsDir);
-    const migrationFiles = migrationsExist ? fs.readdirSync(migrationsDir) : [];
-    console.log(`  Config exists: ${configExists} at ${configPath}`);
-    console.log(`  .sequelizerc exists: ${sequelizercExists} at ${sequelizercPath}`);
-    console.log(`  Migrations dir exists: ${migrationsExist} at ${migrationsDir}`);
-    console.log(`  Migration files: ${migrationFiles.join(', ')}`);
-    const fileCheckLog = {location:'testDbSetup.js:142',message:'Before execSync - file checks',data:{configPath,configExists,sequelizercExists,migrationsDir,migrationsExist,migrationFiles},timestamp:Date.now(),sessionId:'debug-session',runId:'post-fix',hypothesisId:'B'};
-    safeAppendLog(fileCheckLog);
-    fetch('http://127.0.0.1:7243/ingest/b28ba336-f278-4fcf-939d-745bab84e580',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(fileCheckLog)}).catch(()=>{});
-    // #endregion
     
     // Small delay to ensure database is fully ready
     await new Promise(resolve => setTimeout(resolve, 500));
     
-    // #region agent log
-    const envVars = {
-      ...process.env,
-      NODE_ENV: 'test',
-      DB_NAME: config.database,
-      DB_USER: config.username,
-      DB_PASSWORD: config.password ? '***' : undefined
-    };
-    fetch('http://127.0.0.1:7243/ingest/b28ba336-f278-4fcf-939d-745bab84e580',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'testDbSetup.js:150',message:'Before execSync - env vars',data:{cwd:apiServerPath,NODE_ENV:envVars.NODE_ENV,DB_NAME:envVars.DB_NAME,DB_USER:envVars.DB_USER,hasPassword:!!envVars.DB_PASSWORD},timestamp:Date.now(),sessionId:'debug-session',runId:'post-fix',hypothesisId:'C'})}).catch(()=>{});
-    // #endregion
-    
-    // Verify .sequelizerc is in the right place and can be read
-    const sequelizercInCwd = path.resolve(apiServerPath, '.sequelizerc');
-    console.log(`  Checking for .sequelizerc at: ${sequelizercInCwd}`);
-    console.log(`  .sequelizerc exists in cwd: ${fs.existsSync(sequelizercInCwd)}`);
-    
-    // Test loading .sequelizerc
-    // Note: .sequelizerc is CommonJS, but we're in ESM context
-    // We need to use createRequire to load it
-    try {
-      const { createRequire } = await import('module');
-      const require = createRequire(import.meta.url);
-      const rc = require(sequelizercInCwd);
-      console.log(`  .sequelizerc loaded successfully`);
-      console.log(`  .sequelizerc config path: ${rc.config}`);
-      console.log(`  Config file at that path exists: ${fs.existsSync(rc.config)}`);
-      if (fs.existsSync(rc.config)) {
-        const configContent = fs.readFileSync(rc.config, 'utf8');
-        console.log(`  Config file type: ${rc.config.endsWith('.json') ? 'JSON' : rc.config.endsWith('.cjs') ? 'CommonJS' : 'Unknown'}`);
-      }
-      const sequelizercTestLog = {location:'testDbSetup.js:210',message:'sequelizerc test',data:{sequelizercConfigPath:rc.config,configExists:fs.existsSync(rc.config)},timestamp:Date.now(),sessionId:'debug-session',runId:'post-fix',hypothesisId:'F'};
-      safeAppendLog(sequelizercTestLog);
-    } catch (err) {
-      console.log(`  ERROR loading .sequelizerc: ${err.message}`);
-      console.log(`  Error stack: ${err.stack}`);
-      const sequelizercErrorLog = {location:'testDbSetup.js:218',message:'sequelizerc load error',data:{error:err.message},timestamp:Date.now(),sessionId:'debug-session',runId:'post-fix',hypothesisId:'F'};
-      safeAppendLog(sequelizercErrorLog);
-    }
-    
     // Generate config.json dynamically from environment variables
-    // Sequelize CLI seems to prefer JSON format, so we'll create it on-the-fly
+    // Sequelize CLI requires JSON format for configuration
     const configJsonPath = path.resolve(apiServerPath, 'src/config/config.json');
     const configDir = path.dirname(configJsonPath);
     
     // Ensure directory exists
     if (!fs.existsSync(configDir)) {
       fs.mkdirSync(configDir, { recursive: true });
-      console.log(`  Created config directory: ${configDir}`);
     }
     
     const configJson = {
@@ -255,13 +178,6 @@ export async function runMigrations() {
     };
     
     fs.writeFileSync(configJsonPath, JSON.stringify(configJson, null, 2), 'utf8');
-    console.log(`  Generated config.json at: ${configJsonPath}`);
-    console.log(`  Config file exists: ${fs.existsSync(configJsonPath)}`);
-    console.log(`  Test config - database: ${configJson.test.database}, user: ${configJson.test.username}`);
-    
-    // Try migration - Sequelize CLI should find .sequelizerc automatically
-    console.log(`  Running: npx sequelize-cli db:migrate (from ${apiServerPath})`);
-    console.log(`  Current working directory will be: ${apiServerPath}`);
     
     execSync('npx sequelize-cli db:migrate', {
       cwd: apiServerPath,
@@ -275,16 +191,8 @@ export async function runMigrations() {
       stdio: 'inherit'
     });
     
-    // #region agent log
-    fetch('http://127.0.0.1:7243/ingest/b28ba336-f278-4fcf-939d-745bab84e580',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'testDbSetup.js:165',message:'execSync completed successfully',data:{},timestamp:Date.now(),sessionId:'debug-session',runId:'post-fix',hypothesisId:'D'})}).catch(()=>{});
-    // #endregion
-    
     console.log(`✓ Migrations completed successfully`);
   } catch (error) {
-    // #region agent log
-    fetch('http://127.0.0.1:7243/ingest/b28ba336-f278-4fcf-939d-745bab84e580',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'testDbSetup.js:170',message:'execSync error caught',data:{errorMessage:error.message,errorCode:error.status,errorSignal:error.signal,errorOutput:error.output?.map(o=>o?.toString()).filter(Boolean)},timestamp:Date.now(),sessionId:'debug-session',runId:'post-fix',hypothesisId:'E'})}).catch(()=>{});
-    // #endregion
-    
     console.error('Error running migrations:', error.message);
     throw error;
   }

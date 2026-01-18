@@ -5,8 +5,7 @@ const path = require('path');
 
 module.exports = {
   // Path to the database configuration file
-  // Using JSON format as fallback - Sequelize CLI seems to expect this location
-  // Note: This will be overridden by environment variables at runtime
+  // Using JSON format - this file is dynamically generated at test runtime from environment variables
   config: path.resolve(__dirname, 'src/config/config.json'),
   // Path to the folder containing Sequelize models
   modelsPath: path.resolve(__dirname, 'src/data/models'),
