@@ -14,23 +14,24 @@ import { getSequelize } from '../../data/database.js';
 
 let setupComplete = false;
 let teardownComplete = false;
-let setupInProgress = false;
+let setupPromise = null;
 
 /**
  * Global setup function - call this before any tests run
  */
 export async function globalSetup() {
-  // Prevent concurrent setup calls
-  if (setupInProgress) {
-    // Wait for setup to complete
-    while (setupInProgress) {
-      await new Promise(resolve => setTimeout(resolve, 100));
-    }
+  // If setup is already complete, return immediately
+  if (setupComplete) {
     return;
   }
   
-  if (!setupComplete) {
-    setupInProgress = true;
+  // If setup is in progress, wait for the existing promise
+  if (setupPromise) {
+    return setupPromise;
+  }
+  
+  // Start setup and store the promise
+  setupPromise = (async () => {
     console.log('\n🔧 Global Test Setup: Initializing test database...\n');
     
     try {
@@ -40,10 +41,10 @@ export async function globalSetup() {
     } catch (error) {
       console.error('❌ Failed to initialize test database:', error);
       throw error;
-    } finally {
-      setupInProgress = false;
     }
-  }
+  })();
+  
+  return setupPromise;
 }
 
 /**

@@ -84,90 +84,48 @@ describe('Database Guard and Test Lifecycle', () => {
   });
   
   it('should have the tasks table created by migrations', async () => {
-    try {
-      const [results] = await sequelize.query(`
-        SELECT table_name 
-        FROM information_schema.tables 
-        WHERE table_schema = 'public' 
-          AND table_name = 'tasks'
-      `);
-      
-      assert.strictEqual(results.length, 1, 'Tasks table should exist');
-      assert.strictEqual(results[0].table_name, 'tasks');
-    } catch (error) {
-      // Log detailed error for debugging
-      console.error('Error querying tasks table:', error.message);
-      console.error('Error details:', {
-        name: error.name,
-        parent: error.parent?.message,
-        original: error.original?.message,
-        sql: error.sql
-      });
-      throw error;
-    }
+    const [results] = await sequelize.query(`
+      SELECT table_name 
+      FROM information_schema.tables 
+      WHERE table_schema = 'public' 
+        AND table_name = 'tasks'
+    `);
+    
+    assert.strictEqual(results.length, 1, 'Tasks table should exist');
+    assert.strictEqual(results[0].table_name, 'tasks');
   });
   
   it('should have SequelizeMeta table (migrations tracking)', async () => {
-    try {
-      const [results] = await sequelize.query(`
-        SELECT table_name 
-        FROM information_schema.tables 
-        WHERE table_schema = 'public' 
-          AND table_name = 'SequelizeMeta'
-      `);
-      
-      assert.strictEqual(results.length, 1, 'SequelizeMeta table should exist');
-    } catch (error) {
-      console.error('Error querying SequelizeMeta table:', error.message);
-      console.error('Error details:', {
-        name: error.name,
-        parent: error.parent?.message,
-        original: error.original?.message
-      });
-      throw error;
-    }
+    const [results] = await sequelize.query(`
+      SELECT table_name 
+      FROM information_schema.tables 
+      WHERE table_schema = 'public' 
+        AND table_name = 'SequelizeMeta'
+    `);
+    
+    assert.strictEqual(results.length, 1, 'SequelizeMeta table should exist');
   });
   
   it('should have run the create-tasks migration', async () => {
-    try {
-      const [results] = await sequelize.query(`
-        SELECT name 
-        FROM "SequelizeMeta"
-        WHERE name LIKE '%create-tasks%'
-      `);
-      
-      assert.strictEqual(results.length, 1, 'create-tasks migration should be recorded');
-    } catch (error) {
-      console.error('Error querying SequelizeMeta for migration:', error.message);
-      console.error('Error details:', {
-        name: error.name,
-        parent: error.parent?.message,
-        original: error.original?.message
-      });
-      throw error;
-    }
+    const [results] = await sequelize.query(`
+      SELECT name 
+      FROM "SequelizeMeta"
+      WHERE name LIKE '%create-tasks%'
+    `);
+    
+    assert.strictEqual(results.length, 1, 'create-tasks migration should be recorded');
   });
   
   it('should start with an empty tasks table', async () => {
-    try {
-      const [results] = await sequelize.query(`
-        SELECT COUNT(*) as count FROM tasks
-      `);
-      
-      assert.strictEqual(
-        parseInt(results[0].count), 
-        0, 
-        'Tasks table should be empty at test start'
-      );
-    } catch (error) {
-      console.error('Error querying tasks count:', error.message);
-      console.error('Error details:', {
-        name: error.name,
-        parent: error.parent?.message,
-        original: error.original?.message
-      });
-      throw error;
-    }
+    const [results] = await sequelize.query(`
+      SELECT COUNT(*) as count FROM tasks
+    `);
+    
+    assert.strictEqual(
+      parseInt(results[0].count), 
+      0, 
+      'Tasks table should be empty at test start'
+    );
   });
   
   it('should prevent sync() from being called', async () => {
