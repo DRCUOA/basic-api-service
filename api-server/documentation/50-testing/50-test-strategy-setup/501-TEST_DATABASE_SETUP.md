@@ -143,7 +143,7 @@ The test infrastructure **automatically manages** the test database lifecycle:
 
 3. **Teardown Phase** (after tests complete):
    - Leaves database intact (prevents connection termination errors during parallel test execution)
-   - Database is dropped/recreated fresh at the start of each test run anyway
+   - Database is idempotent and persists across test runs
    - Connections remain open until process exits
 
 ### What You DON'T Need to Do
