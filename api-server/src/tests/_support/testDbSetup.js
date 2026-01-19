@@ -47,9 +47,14 @@ export function getTestDbConfig() {
   const dbName = process.env.DB_NAME || 'basic_api_test';
   validateTestDatabase(dbName);
   
+  const password = process.env.DB_PASSWORD;
+  if (!password) {
+    console.warn('⚠ DB_PASSWORD environment variable is not set. Using password-less authentication.');
+  }
+  
   return {
     username: process.env.DB_USER || 'postgres',
-    password: process.env.DB_PASSWORD,
+    password: password,
     database: dbName,
     host: process.env.DB_HOST || 'localhost',
     port: process.env.DB_PORT || 5432,
@@ -109,7 +114,8 @@ export async function dropTestDatabase(dbName, forceCloseConnections = true) {
     
     // Drop the database - use identifier quoting for safety
     // Note: PostgreSQL doesn't support parameterized database names, so we validate and quote
-    await systemSequelize.query(`DROP DATABASE IF EXISTS ${systemSequelize.queryInterface.queryGenerator.quoteIdentifier(dbName)};`);
+    const quotedDbName = systemSequelize.queryInterface.queryGenerator.quoteIdentifier(dbName);
+    await systemSequelize.query(`DROP DATABASE IF EXISTS ${quotedDbName};`);
     console.log(`✓ Test database "${dbName}" dropped successfully`);
   } catch (error) {
     console.error(`Error dropping test database "${dbName}":`, error.message);
@@ -129,7 +135,8 @@ export async function createTestDatabase(dbName) {
   const systemSequelize = getSystemSequelize();
   
   try {
-    await systemSequelize.query(`CREATE DATABASE ${systemSequelize.queryInterface.queryGenerator.quoteIdentifier(dbName)};`);
+    const quotedDbName = systemSequelize.queryInterface.queryGenerator.quoteIdentifier(dbName);
+    await systemSequelize.query(`CREATE DATABASE ${quotedDbName};`);
     console.log(`✓ Test database "${dbName}" created successfully`);
   } catch (error) {
     // Ignore error if database already exists
