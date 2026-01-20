@@ -31,10 +31,10 @@ function validateTestDatabase(dbName) {
   }
   
   // Additional validation: ensure database name only contains safe characters
-  // Allow alphanumeric, underscores, and hyphens
-  if (!/^[a-zA-Z0-9_-]+$/.test(dbName)) {
+  // Allow alphanumeric, underscores, hyphens, and dots
+  if (!/^[a-zA-Z0-9_.-]+$/.test(dbName)) {
     throw new Error(
-      `FATAL: Invalid database name. Database name can only contain letters, numbers, underscores, and hyphens. Got: "${dbName}"`
+      `FATAL: Invalid database name. Database name can only contain letters, numbers, underscores, hyphens, and dots. Got: "${dbName}"`
     );
   }
 }
@@ -47,8 +47,9 @@ export function getTestDbConfig() {
   const dbName = process.env.DB_NAME || 'basic_api_test';
   validateTestDatabase(dbName);
   
-  const password = process.env.DB_PASSWORD;
-  if (!password) {
+  const passwordEnv = process.env.DB_PASSWORD;
+  const password = passwordEnv === undefined || passwordEnv === '' ? null : passwordEnv;
+  if (passwordEnv === undefined) {
     console.warn('⚠ DB_PASSWORD environment variable is not set. Using password-less authentication.');
   }
   
@@ -57,7 +58,7 @@ export function getTestDbConfig() {
     password: password,
     database: dbName,
     host: process.env.DB_HOST || 'localhost',
-    port: process.env.DB_PORT || 5432,
+    port: parseInt(process.env.DB_PORT || '5432', 10),
     dialect: 'postgres'
   };
 }
@@ -92,8 +93,8 @@ export async function dropTestDatabase(dbName, forceCloseConnections = true) {
   
   try {
     if (forceCloseConnections) {
-      // Terminate all connections to the database
-      // Use a more careful approach - only terminate if we're sure no tests are running
+      // Terminate all other connections to the test database
+      // NOTE: This unconditionally forces disconnection of other clients; ensure no tests are actively using the DB before calling
       try {
         await systemSequelize.query(
           `
@@ -179,10 +180,11 @@ export async function runMigrations() {
       await fs.mkdir(configDir, { recursive: true });
     }
     
+    const passwordEnv = process.env.DB_PASSWORD;
     const configJson = {
       development: {
         username: process.env.DB_USER || 'postgres',
-        password: process.env.DB_PASSWORD || undefined,
+        password: passwordEnv === undefined || passwordEnv === '' ? null : passwordEnv,
         database: process.env.DB_NAME || 'basic_api_dev',
         host: process.env.DB_HOST || 'localhost',
         port: parseInt(process.env.DB_PORT || '5432', 10),
@@ -190,15 +192,20 @@ export async function runMigrations() {
       },
       test: {
         username: config.username,
-        password: config.password || undefined,
+        password: config.password,
         database: config.database,
-        host: process.env.DB_HOST || 'localhost',
-        port: parseInt(process.env.DB_PORT || '5432', 10),
+        host: config.host,
+        port: config.port,
         dialect: 'postgres'
       }
     };
     
     await fs.writeFile(configJsonPath, JSON.stringify(configJson, null, 2), 'utf8');
+    
+    // Store config path for cleanup later
+    if (!global.__configJsonPath) {
+      global.__configJsonPath = configJsonPath;
+    }
     
     execSync('npx sequelize-cli db:migrate', {
       cwd: apiServerPath,
@@ -260,12 +267,23 @@ export async function setupTestDatabase() {
         
         try {
           await testSequelize.authenticate();
-          // Check if migrations table exists (indicates migrations have run)
+          // Check if migrations table exists and verify expected application tables exist
           const [migrationsCheck] = await testSequelize.query(`
             SELECT 1 FROM information_schema.tables 
             WHERE table_schema = 'public' AND table_name = 'SequelizeMeta'
           `);
-          schemaExists = migrationsCheck.length > 0;
+          
+          if (migrationsCheck.length > 0) {
+            // SequelizeMeta exists, now verify at least one core application table exists
+            // This ensures migrations actually ran successfully and weren't just partially completed
+            const [appTablesCheck] = await testSequelize.query(`
+              SELECT COUNT(*) as count FROM information_schema.tables 
+              WHERE table_schema = 'public' 
+              AND table_name NOT IN ('SequelizeMeta')
+            `);
+            schemaExists = appTablesCheck[0].count > 0;
+          }
+          
           await testSequelize.close();
         } catch (err) {
           // Can't connect or check - assume schema doesn't exist
@@ -276,7 +294,8 @@ export async function setupTestDatabase() {
       await systemSequelize.close();
     } catch (err) {
       await systemSequelize.close().catch(() => {});
-      // If check fails, assume database doesn't exist
+      console.error('Failed to verify test database existence or schema state:', err);
+      throw err;
     }
     
     if (dbExists && schemaExists) {
@@ -302,7 +321,7 @@ export async function setupTestDatabase() {
 }
 
 /**
- * Tears down the test database: logs teardown status
+ * Tears down the test database: logs teardown status and cleans up config file
  * Note: We don't drop the database or close connections here because:
  * 1. Tests may still be running in parallel
  * 2. The database is idempotent and persists across test runs
@@ -312,23 +331,32 @@ export async function setupTestDatabase() {
 export async function teardownTestDatabase() {
   console.log('\n=== Test Database Teardown ===');
   
-  try {
-    // Don't close any Sequelize connections here because:
-    // - Tests may still be running and need the connection
-    // - Closing the connection causes ECONNRESET errors in active tests
-    // - The connection will be closed when the process exits
-    console.log('✓ Sequelize connections will remain open (tests may still be running)');
-    
-    // Note: We intentionally don't drop the database here because:
-    // - Tests may still be running in parallel
-    // - The database is idempotent and persists across test runs
-    // - Dropping while active causes connection termination errors
-    console.log('✓ Database left intact (idempotent setup on next test run)');
-    
-    console.log('=== Test Database Teardown Complete ===\n');
-  } catch (error) {
-    console.error('Failed to teardown test database:', error.message);
-    // Don't throw - teardown failures shouldn't fail the test suite
-    console.warn('⚠ Teardown error ignored to allow test suite to complete');
+  // Don't close any Sequelize connections here because:
+  // - Tests may still be running and need the connection
+  // - Closing the connection causes ECONNRESET errors in active tests
+  // - The connection will be closed when the process exits
+  console.log('✓ Sequelize connections will remain open (tests may still be running)');
+  
+  // Note: We intentionally don't drop the database here because:
+  // - Tests may still be running in parallel
+  // - The database is idempotent and persists across test runs
+  // - Dropping while active causes connection termination errors
+  console.log('✓ Database left intact (idempotent setup on next test run)');
+  
+  // Clean up the dynamically generated config.json file
+  if (global.__configJsonPath) {
+    try {
+      const fs = await import('fs/promises');
+      await fs.unlink(global.__configJsonPath);
+      console.log('✓ Cleaned up config.json file');
+      delete global.__configJsonPath;
+    } catch (err) {
+      // File might not exist or already deleted, which is fine
+      if (err.code !== 'ENOENT') {
+        console.warn('⚠ Could not delete config.json:', err.message);
+      }
+    }
   }
+  
+  console.log('=== Test Database Teardown Complete ===\n');
 }

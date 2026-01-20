@@ -6,6 +6,8 @@ const path = require('path');
 module.exports = {
   // Path to the database configuration file
   // Using JSON format - this file is dynamically generated at test runtime from environment variables
+  // NOTE: For manual Sequelize CLI operations outside of tests, this file must exist or you should
+  // temporarily modify this path to point to a valid config file (e.g., src/config/database.cjs)
   config: path.resolve(__dirname, 'src/config/config.json'),
   // Path to the folder containing Sequelize models
   modelsPath: path.resolve(__dirname, 'src/data/models'),
