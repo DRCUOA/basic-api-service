@@ -49,7 +49,7 @@ export function getTestDbConfig() {
   
   const passwordEnv = process.env.DB_PASSWORD;
   const password = passwordEnv === undefined || passwordEnv === '' ? null : passwordEnv;
-  if (!passwordEnv) {
+  if (passwordEnv === undefined) {
     console.warn('⚠ DB_PASSWORD environment variable is not set. Using password-less authentication.');
   }
   
@@ -281,7 +281,7 @@ export async function setupTestDatabase() {
               WHERE table_schema = 'public' 
               AND table_name NOT IN ('SequelizeMeta')
             `);
-            schemaExists = appTablesCheck.length > 0 && appTablesCheck[0].count > 0;
+            schemaExists = appTablesCheck[0].count > 0;
           }
           
           await testSequelize.close();
