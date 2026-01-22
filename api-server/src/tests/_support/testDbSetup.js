@@ -209,7 +209,13 @@ export async function runMigrations() {
     
     await fs.writeFile(configJsonPath, JSON.stringify(configJson, null, 2), 'utf8');
     
-    // Store config path for cleanup later
+    // Store config path(s) for cleanup later
+    if (!global.__configJsonPaths) {
+      global.__configJsonPaths = new Set();
+    }
+    global.__configJsonPaths.add(configJsonPath);
+
+    // Preserve original singleton reference for backward compatibility
     if (!global.__configJsonPath) {
       global.__configJsonPath = configJsonPath;
     }
