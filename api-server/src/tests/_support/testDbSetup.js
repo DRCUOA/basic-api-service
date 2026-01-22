@@ -287,14 +287,22 @@ export async function setupTestDatabase() {
           `);
           
           if (migrationsCheck.length > 0) {
-            // SequelizeMeta exists, now verify at least one core application table exists
+            // SequelizeMeta exists, now verify all migrations have been applied
             // This ensures migrations actually ran successfully and weren't just partially completed
-            const [appTablesCheck] = await testSequelize.query(`
-              SELECT COUNT(*) as count FROM information_schema.tables 
-              WHERE table_schema = 'public' 
-              AND table_name NOT IN ('SequelizeMeta')
+            const [migrationsApplied] = await testSequelize.query(`
+              SELECT COUNT(*) as count FROM "SequelizeMeta"
             `);
-            schemaExists = appTablesCheck[0].count > 0;
+            
+            // Count expected migration files
+            const fs = await import('fs/promises');
+            const migrationsDir = path.resolve(__dirname, '../../database/migrations');
+            const migrationFiles = await fs.readdir(migrationsDir);
+            const expectedMigrationCount = migrationFiles.filter(f => 
+              f.endsWith('.js') || f.endsWith('.cjs')
+            ).length;
+            
+            // Schema exists only if all expected migrations have been applied
+            schemaExists = migrationsApplied[0].count >= expectedMigrationCount;
           }
           
           await testSequelize.close();
