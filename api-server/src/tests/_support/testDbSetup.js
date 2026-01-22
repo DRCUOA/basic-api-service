@@ -13,6 +13,7 @@ import { Sequelize } from 'sequelize';
 import { execSync } from 'child_process';
 import path from 'path';
 import { fileURLToPath } from 'url';
+import fs from 'fs/promises';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -161,7 +162,6 @@ export async function runMigrations() {
   
   try {
     const apiServerPath = path.resolve(__dirname, '../../../');
-    const fs = await import('fs/promises');
     
     console.log(`✓ Running migrations on test database "${config.database}"...`);
     
@@ -294,11 +294,10 @@ export async function setupTestDatabase() {
             `);
             
             // Count expected migration files
-            const fs = await import('fs/promises');
             const migrationsDir = path.resolve(__dirname, '../../database/migrations');
             const migrationFiles = await fs.readdir(migrationsDir);
             const expectedMigrationCount = migrationFiles.filter(f => 
-              f.endsWith('.js') || f.endsWith('.cjs')
+              f.endsWith('.js') || f.endsWith('.cjs') || f.endsWith('.mjs')
             ).length;
             
             // Schema exists only if all expected migrations have been applied
@@ -367,7 +366,6 @@ export async function teardownTestDatabase() {
   // Clean up the dynamically generated config.json file
   if (global.__configJsonPath) {
     try {
-      const fs = await import('fs/promises');
       await fs.unlink(global.__configJsonPath);
       console.log('✓ Cleaned up config.json file');
       delete global.__configJsonPath;
