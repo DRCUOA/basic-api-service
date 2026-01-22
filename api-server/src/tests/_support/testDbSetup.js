@@ -49,8 +49,8 @@ export function getTestDbConfig() {
   
   const passwordEnv = process.env.DB_PASSWORD;
   const password = passwordEnv === undefined || passwordEnv === '' ? null : passwordEnv;
-  if (passwordEnv === undefined) {
-    console.warn('⚠ DB_PASSWORD environment variable is not set. Using password-less authentication.');
+  if (passwordEnv === undefined || passwordEnv === '') {
+    console.warn('⚠ DB_PASSWORD environment variable is not set or is empty. Using password-less authentication.');
   }
   
   return {
