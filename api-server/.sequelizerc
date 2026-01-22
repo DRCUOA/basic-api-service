@@ -5,7 +5,7 @@ const path = require('path');
 
 module.exports = {
   // Path to the database configuration file
-  config: path.resolve('src/data/config/database.js'),
+  config: path.resolve('src/data/config/database.cjs'),
   // Path to the folder containing Sequelize models
   modelsPath: path.resolve('src/data/models'),
   // Path to the folder where migration files are stored
