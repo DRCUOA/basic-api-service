@@ -280,7 +280,7 @@ export async function setupTestDatabase() {
         
         try {
           await testSequelize.authenticate();
-          // Check if migrations table exists and verify expected application tables exist
+          // Check if migrations table exists and verify all migrations have been applied
           const [migrationsCheck] = await testSequelize.query(`
             SELECT 1 FROM information_schema.tables 
             WHERE table_schema = 'public' AND table_name = 'SequelizeMeta'
