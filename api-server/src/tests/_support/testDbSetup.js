@@ -173,11 +173,18 @@ export async function runMigrations() {
     const configJsonPath = path.resolve(apiServerPath, 'src/config/config.json');
     const configDir = path.dirname(configJsonPath);
     
-    // Ensure directory exists
+    // Ensure directory exists and is actually a directory
     try {
-      await fs.access(configDir);
-    } catch {
-      await fs.mkdir(configDir, { recursive: true });
+      const stats = await fs.stat(configDir);
+      if (!stats.isDirectory()) {
+        throw new Error(`Expected "${configDir}" to be a directory, but found a non-directory file.`);
+      }
+    } catch (err) {
+      if (err && err.code === 'ENOENT') {
+        await fs.mkdir(configDir, { recursive: true });
+      } else {
+        throw err;
+      }
     }
     
     const passwordEnv = process.env.DB_PASSWORD;
