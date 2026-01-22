@@ -1,14 +1,26 @@
 const path = require('path');
+const fs = require('fs');
 
 // This configuration file tells Sequelize CLI where to find important directories and files.
 // Paths are resolved relative to where Sequelize CLI runs (the project root where this file is located).
 
+// Fallback mechanism for config file:
+// 1. Use config.json if it exists (dynamically generated at test runtime)
+// 2. Fall back to database.cjs for manual CLI operations
+const configJsonPath = path.resolve(__dirname, 'src/config/config.json');
+const databaseCjsPath = path.resolve(__dirname, 'src/data/config/database.cjs');
+
+let configPath;
+if (fs.existsSync(configJsonPath)) {
+  configPath = configJsonPath;
+} else {
+  configPath = databaseCjsPath;
+}
+
 module.exports = {
   // Path to the database configuration file
-  // Using JSON format - this file is dynamically generated at test runtime from environment variables
-  // NOTE: For manual Sequelize CLI operations outside of tests, this file must exist or you should
-  // temporarily modify this path to point to a valid config file (e.g., src/config/database.cjs)
-  config: path.resolve(__dirname, 'src/config/config.json'),
+  // Automatically uses config.json (test runtime) or database.cjs (manual CLI operations)
+  config: configPath,
   // Path to the folder containing Sequelize models
   modelsPath: path.resolve(__dirname, 'src/data/models'),
   // Path to the folder where migration files are stored (CommonJS for Sequelize CLI)
