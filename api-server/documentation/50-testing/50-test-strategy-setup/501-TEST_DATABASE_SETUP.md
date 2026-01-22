@@ -326,3 +326,12 @@ The project uses ES modules (`"type": "module"`), but Sequelize CLI requires Com
 - **Tooling boundary**: Migrations and CLI config are isolated from the ESM application
 
 This hybrid approach maintains ESM for the application while providing CommonJS compatibility for Sequelize CLI.
+
+### Automatic Configuration Fallback
+
+The `.sequelizerc` file includes an automatic fallback mechanism for Sequelize CLI operations:
+
+1. **During test execution**: Uses `src/config/config.json` (dynamically generated from environment variables)
+2. **During manual CLI operations**: Falls back to `src/data/config/database.cjs` (reads from .env file)
+
+This means developers can run manual Sequelize CLI commands (e.g., `npx sequelize-cli migration:generate --name new-migration`) without needing to create the test-time config.json file. The fallback ensures CLI tools work seamlessly in both test and development contexts.
