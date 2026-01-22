@@ -31,10 +31,10 @@ function validateTestDatabase(dbName) {
   }
   
   // Additional validation: ensure database name only contains safe characters
-  // Allow alphanumeric, underscores, hyphens, and dots
-  if (!/^[a-zA-Z0-9_.-]+$/.test(dbName)) {
+  // Allow alphanumeric, underscores, and hyphens
+  if (!/^[a-zA-Z0-9_-]+$/.test(dbName)) {
     throw new Error(
-      `FATAL: Invalid database name. Database name can only contain letters, numbers, underscores, hyphens, and dots. Got: "${dbName}"`
+      `FATAL: Invalid database name. Database name can only contain letters, numbers, underscores, and hyphens. Got: "${dbName}"`
     );
   }
 }
