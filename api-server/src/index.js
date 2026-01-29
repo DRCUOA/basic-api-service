@@ -5,6 +5,7 @@ import logger from "./utils/logger.js";
 import * as tasksDao from "./data/models/tasksDao.js";
 import { createTaskService } from "./domain/taskService.js";
 import { createTaskController } from "./api/controllers/taskController.js";
+import { createHealthController } from "./api/controllers/healthController.js";
 import routes from "./api/routes/routes.js";
 
 
@@ -13,6 +14,7 @@ app.use(express.json());
 
 const taskService = createTaskService(tasksDao, logger);
 const taskController = createTaskController(taskService, logger);
+const healthController = createHealthController(logger);
 
 
 async function initializeApp() {
@@ -55,6 +57,10 @@ async function initializeApp() {
     
 
     logger.info("API booted with migration-only schema control.");
+
+    // Health check landing page (accessible from browser)
+    app.get("/", healthController.getHealth);
+    app.get("/health", healthController.getHealth);
 
     app.use("/api", routes({ taskController }));
 

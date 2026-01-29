@@ -62,6 +62,17 @@ This document tracks explicit changes between structure file versions.
 | 1.32 → 1.4 | Sun 18 Jan 2026 12:28:13 NZDT | Added | `src/tests/README-TESTS.md` | Comprehensive test documentation and guidelines |
 | 1.32 → 1.4 | Sun 18 Jan 2026 12:28:13 NZDT | Added | `structure-changelog.md` | Structure changelog file now visible in structure tree |
 | 1.32 → 1.4 | Sun 18 Jan 2026 12:28:13 NZDT | Added | `documentation/00-history/structure1_4.md` | New structure documentation snapshot |
+| 1.32 → 1.33 | Fri 30 Jan 2026 11:23:31 NZDT | Added | `src/api/controllers/healthController.js` | Health check controller for landing page |
+| 1.32 → 1.33 | Fri 30 Jan 2026 11:23:31 NZDT | Added | `src/data/config/database.cjs` | Additional database configuration file |
+| 1.32 → 1.33 | Fri 30 Jan 2026 11:23:31 NZDT | Added | `src/database/migrations/20260122035250-seed-tasks.cjs` | Migration for seeding tasks |
+| 1.32 → 1.33 | Fri 30 Jan 2026 11:23:31 NZDT | Added | `src/database/migrations/20260129205633-change-task-id-to-uuid.js` | Migration to change task ID to UUID |
+| 1.32 → 1.33 | Fri 30 Jan 2026 11:23:31 NZDT | Added | `src/public/` | New public assets directory |
+| 1.32 → 1.33 | Fri 30 Jan 2026 11:23:31 NZDT | Added | `src/public/assets/` | Public assets subdirectory |
+| 1.32 → 1.33 | Fri 30 Jan 2026 11:23:31 NZDT | Added | `src/public/assets/basic-api-service-logo-1024-1024.png` | Application logo asset |
+| 1.32 → 1.33 | Fri 30 Jan 2026 11:23:31 NZDT | Added | `src/tests/_support/testEnvLoader.js` | Test environment loader utility |
+| 1.32 → 1.33 | Fri 30 Jan 2026 11:23:31 NZDT | Added | `src/tests/README-TESTS.md` | Test documentation file |
+| 1.32 → 1.33 | Fri 30 Jan 2026 11:23:31 NZDT | Removed | `src/database/seeders/` | Seeders directory removed (empty) |
+| 1.32 → 1.33 | Fri 30 Jan 2026 11:23:31 NZDT | Changed | `src/api/controllers/` | Now contains two controller files (taskController.js and healthController.js) |
 
 ## Machine-Readable Format (JSON)
 
