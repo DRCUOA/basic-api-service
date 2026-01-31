@@ -62,6 +62,14 @@ This document tracks explicit changes between structure file versions.
 | 1.32 → 1.33 | Sun 18 Jan 2026 12:28:13 NZDT | Added | `src/tests/README-TESTS.md` | Comprehensive test documentation and guidelines |
 | 1.32 → 1.33 | Sun 18 Jan 2026 12:28:13 NZDT | Added | `structure-changelog.md` | Structure changelog file now visible in structure tree |
 | 1.32 → 1.33 | Sun 18 Jan 2026 12:28:13 NZDT | Added | `documentation/00-history/structure1_4.md` | New structure documentation snapshot |
+| 1.33 → 1.34 | Sat 31 Jan 2026 22:56:31 NZDT | Added | `map_structure.sh` | Structure mapping script now visible in structure tree |
+| 1.33 → 1.34 | Sat 31 Jan 2026 22:56:31 NZDT | Added | `src/public/assets/css/` | New CSS directory for static stylesheets |
+| 1.33 → 1.34 | Sat 31 Jan 2026 22:56:31 NZDT | Added | `src/public/assets/css/health.css` | Health check page stylesheet |
+| 1.33 → 1.34 | Sat 31 Jan 2026 22:56:31 NZDT | Added | `src/utils/templateRenderer.js` | Template rendering utility for HTML templates |
+| 1.33 → 1.34 | Sat 31 Jan 2026 22:56:31 NZDT | Added | `src/views/` | New views directory for HTML templates |
+| 1.33 → 1.34 | Sat 31 Jan 2026 22:56:31 NZDT | Added | `src/views/health-error.html` | Error page template for health check |
+| 1.33 → 1.34 | Sat 31 Jan 2026 22:56:31 NZDT | Added | `src/views/health.html` | Health check page template |
+| 1.33 → 1.34 | Sat 31 Jan 2026 22:56:31 NZDT | Changed | Title | Changed from "Project Structure: api-server" to "Project Structure: ." |
 
 ## Machine-Readable Format (JSON)
 
@@ -381,6 +389,52 @@ This document tracks explicit changes between structure file versions.
           "type": "added",
           "path": "documentation/00-history/structure1_4.md",
           "description": "New structure documentation snapshot"
+        }
+      ]
+    },
+    "1.33_to_1.34": {
+      "version": "1.33 → 1.34",
+      "date": "Sat 31 Jan 2026 22:56:31 NZDT",
+      "changes": [
+        {
+          "type": "added",
+          "path": "map_structure.sh",
+          "description": "Structure mapping script now visible in structure tree"
+        },
+        {
+          "type": "added",
+          "path": "src/public/assets/css/",
+          "description": "New CSS directory for static stylesheets"
+        },
+        {
+          "type": "added",
+          "path": "src/public/assets/css/health.css",
+          "description": "Health check page stylesheet"
+        },
+        {
+          "type": "added",
+          "path": "src/utils/templateRenderer.js",
+          "description": "Template rendering utility for HTML templates"
+        },
+        {
+          "type": "added",
+          "path": "src/views/",
+          "description": "New views directory for HTML templates"
+        },
+        {
+          "type": "added",
+          "path": "src/views/health-error.html",
+          "description": "Error page template for health check"
+        },
+        {
+          "type": "added",
+          "path": "src/views/health.html",
+          "description": "Health check page template"
+        },
+        {
+          "type": "changed",
+          "path": "Title",
+          "description": "Changed from \"Project Structure: api-server\" to \"Project Structure: .\""
         }
       ]
     }

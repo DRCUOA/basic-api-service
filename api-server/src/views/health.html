@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Health Check - Basic API Service</title>
+  <link rel="stylesheet" href="/assets/css/health.css">
+</head>
+<body>
+  <div class="container">
+    <h1>
+      Health Check
+      <span class="status-badge" style="background-color: {{STATUS_COLOR}};">{{STATUS_TEXT}}</span>
+    </h1>
+    <div class="stats-grid">
+      <div class="stat-item">
+        <div class="stat-label">Status</div>
+        <div class="stat-value">{{STATUS}}</div>
+      </div>
+      <div class="stat-item">
+        <div class="stat-label">Database</div>
+        <div class="stat-value">{{DB_STATUS}}</div>
+        {{DB_ERROR}}
+      </div>
+      <div class="stat-item">
+        <div class="stat-label">Uptime</div>
+        <div class="stat-value">{{UPTIME}}</div>
+      </div>
+      <div class="stat-item">
+        <div class="stat-label">Environment</div>
+        <div class="stat-value">{{NODE_ENV}}</div>
+      </div>
+      <div class="stat-item">
+        <div class="stat-label">Port</div>
+        <div class="stat-value">{{PORT}}</div>
+      </div>
+      <div class="stat-item">
+        <div class="stat-label">Timestamp</div>
+        <div class="stat-value">{{TIMESTAMP}}</div>
+      </div>
+    </div>
+    <div class="footer">
+      Basic API Service Health Check
+      <div class="api-link">
+        <a href="/api/tasks">View API Tasks</a>
+      </div>
+    </div>
+  </div>
+</body>
+</html>
