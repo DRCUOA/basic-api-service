@@ -7,6 +7,32 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.3.0] - 2026-01-31
+
+### Added
+- Static file serving middleware for serving CSS, images, and other assets from `src/public` directory
+- Template rendering system (`templateRenderer.js`) for separating HTML from controller logic
+- HTML template files (`health.html`, `health-error.html`) in `src/views/` directory
+- External CSS stylesheet (`health.css`) for health check page styling
+- Logo background image on health check page with 0.3 opacity covering entire container
+- Link to `/api/tasks` endpoint in health check page footer
+- JSON formatting with 2-space indentation (like `jq`) for all API responses
+- Structure documentation snapshot (`structure1_34.md`) capturing current project state
+
+### Changed
+- Refactored health check controller to use template files instead of inline HTML strings
+- Health check page now uses external CSS stylesheet instead of inline styles
+- Stat-item backgrounds set to full opacity (100%) for better readability
+- Updated `index.js` to configure static file serving and JSON formatting
+- Incremented package version from 1.2.0 to 1.3.0
+- Updated structure changelog to track changes from version 1.33 to 1.34
+
+### Technical Details
+- Template system uses simple placeholder replacement (`{{KEY}}` → value)
+- Static files served from `/assets/*` paths (maps to `src/public/assets/*`)
+- Logo displayed as background image with CSS pseudo-element for opacity control
+- JSON responses formatted with `app.set('json spaces', 2)` for readability
+
 ## [1.2.0] - 2026-01-30
 
 ### Added
@@ -108,6 +134,34 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ```json
 {
   "changelog": {
+    "1.3.0": {
+      "version": "1.3.0",
+      "date": "2026-01-31",
+      "added": [
+        "Static file serving middleware for serving CSS, images, and other assets from `src/public` directory",
+        "Template rendering system (`templateRenderer.js`) for separating HTML from controller logic",
+        "HTML template files (`health.html`, `health-error.html`) in `src/views/` directory",
+        "External CSS stylesheet (`health.css`) for health check page styling",
+        "Logo background image on health check page with 0.3 opacity covering entire container",
+        "Link to `/api/tasks` endpoint in health check page footer",
+        "JSON formatting with 2-space indentation (like `jq`) for all API responses",
+        "Structure documentation snapshot (`structure1_34.md`) capturing current project state"
+      ],
+      "changed": [
+        "Refactored health check controller to use template files instead of inline HTML strings",
+        "Health check page now uses external CSS stylesheet instead of inline styles",
+        "Stat-item backgrounds set to full opacity (100%) for better readability",
+        "Updated `index.js` to configure static file serving and JSON formatting",
+        "Incremented package version from 1.2.0 to 1.3.0",
+        "Updated structure changelog to track changes from version 1.33 to 1.34"
+      ],
+      "technicalDetails": [
+        "Template system uses simple placeholder replacement (`{{KEY}}` → value)",
+        "Static files served from `/assets/*` paths (maps to `src/public/assets/*`)",
+        "Logo displayed as background image with CSS pseudo-element for opacity control",
+        "JSON responses formatted with `app.set('json spaces', 2)` for readability"
+      ]
+    },
     "unreleased": {
       "version": "Unreleased",
       "added": [

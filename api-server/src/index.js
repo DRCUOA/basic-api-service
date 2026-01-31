@@ -1,5 +1,7 @@
 import 'dotenv/config';
 import express from "express";
+import { fileURLToPath } from 'url';
+import { dirname, join } from 'path';
 import { getSequelize, testConnection, verifySchema} from "./data/database.js";
 import logger from "./utils/logger.js";
 import * as tasksDao from "./data/models/tasksDao.js";
@@ -8,9 +10,17 @@ import { createTaskController } from "./api/controllers/taskController.js";
 import { createHealthController } from "./api/controllers/healthController.js";
 import routes from "./api/routes/routes.js";
 
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
 
 const app = express();
 app.use(express.json());
+
+// Format JSON output with indentation (like jq)
+app.set('json spaces', 2);
+
+// Serve static files from the public directory
+app.use(express.static(join(__dirname, 'public')));
 
 const taskService = createTaskService(tasksDao, logger);
 const taskController = createTaskController(taskService, logger);
