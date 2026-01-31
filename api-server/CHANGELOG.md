@@ -7,6 +7,35 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.2.0] - 2026-01-30
+
+### Added
+- Health check landing page accessible from browser at root (`/`) and `/health` routes
+- Health check controller (`healthController.js`) with factory pattern following existing architecture
+- HTML health check page with styled UI displaying system status, database connection, uptime, environment, and timestamp
+- JSON health check endpoint (returns JSON when `Accept: application/json` header is present)
+- Health check stats including:
+  - Overall system status (healthy/unhealthy)
+  - Database connection status with error details if disconnected
+  - Server uptime in seconds
+  - Environment information (NODE_ENV, PORT)
+  - Current timestamp
+- Structure documentation snapshot (`structure1_33.md`) capturing current project state
+
+### Changed
+- Updated `index.js` to include health check routes at root level (before API routes)
+- Incremented package version from 1.1.0 to 1.2.0
+- Updated structure changelog to track changes from version 1.32 to 1.33
+
+### Technical Details
+- Health check controller follows the same factory pattern as `taskController`
+- Dual format support: HTML for browser access, JSON for API monitoring tools
+- Database connection is tested on each health check request
+- Appropriate HTTP status codes: 200 for healthy, 503 for unhealthy
+- Error handling with fallback HTML error page for unexpected failures
+
+## [Unreleased]
+
 ### Added
 - Organized test structure with numbered directories (`00-invariants/`, `10-database/`, `20-domain/`, `30-api/`, `40-integration/`, `zz-teardown/`) for clear test execution order
 - Comprehensive test file header comments following detailed documentation pattern with Purpose, structure rationale, assertions, and scope boundaries
