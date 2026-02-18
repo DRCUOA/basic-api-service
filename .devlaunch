@@ -1,0 +1,7 @@
+# Basic API Service (Express + Sequelize + PostgreSQL)
+name = basic-api-service
+
+[api]
+cmd  = npm run dev
+port = 3150
+cwd  = api-server
